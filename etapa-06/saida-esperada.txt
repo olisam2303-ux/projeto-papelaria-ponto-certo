@@ -1,0 +1,93 @@
+SAÍDA ESPERADA - ETAPA 6: Cupom de desconto (depuração)
+================================================================
+Para comparar: rode  python etapa-06/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - cupom PONTO10 -----------------------------------
+Valores digitados: Caderno / 25 / 2 / n / PONTO10
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): PONTO10
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 10.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 55.00
+Brinde: Não
+----------------------------------
+
+---- Teste 2 - sem cupom (só Enter) ----------------------------
+Valores digitados: Caderno / 25 / 2 / n / (só Enter)
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): 
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+----------------------------------
+
+---- Teste 3 - cupom digitado em minúsculas --------------------
+Valores digitados: Caderno / 25 / 2 / n / ponto10
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): ponto10
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 10.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 55.00
+Brinde: Não
+----------------------------------
+
+---- Teste 4 - cupom que não existe ----------------------------
+Valores digitados: Caderno / 25 / 2 / n / PONTO5
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): PONTO5
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+----------------------------------

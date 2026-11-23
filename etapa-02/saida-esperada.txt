@@ -1,0 +1,69 @@
+SAÍDA ESPERADA - ETAPA 2: Frete (SE / SENÃO)
+================================================================
+Para comparar: rode  python etapa-02/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - compra de R$ 37,50 (paga frete) -----------------
+Valores digitados: Caderno / 12.50 / 3
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 12.50
+Quantidade: 3
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 3
+Subtotal: R$ 37.50
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 52.50
+----------------------------------
+
+---- Teste 2 - compra de exatamente R$ 200,00 (limite) ---------
+Valores digitados: Agenda / 50 / 4
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Agenda
+Preço unitário (R$): 50
+Quantidade: 4
+----------------------------------
+RESUMO DA VENDA
+Produto: Agenda
+Quantidade: 4
+Subtotal: R$ 200.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 200.00
+----------------------------------
+
+---- Teste 3 - compra de R$ 250,00 (frete grátis) --------------
+Valores digitados: Mochila / 125 / 2
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Mochila
+Preço unitário (R$): 125
+Quantidade: 2
+----------------------------------
+RESUMO DA VENDA
+Produto: Mochila
+Quantidade: 2
+Subtotal: R$ 250.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 250.00
+----------------------------------
+
+---- Teste 4 - compra de R$ 3,00 (paga frete) ------------------
+Valores digitados: Lápis / 1.50 / 2
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Lápis
+Preço unitário (R$): 1.50
+Quantidade: 2
+----------------------------------
+RESUMO DA VENDA
+Produto: Lápis
+Quantidade: 2
+Subtotal: R$ 3.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 18.00
+----------------------------------

@@ -1,0 +1,19 @@
+SAÍDA ESPERADA - ETAPA 0: Testando o ambiente
+================================================================
+Para comparar: rode  python etapa-00/ola.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - aluna chamada Ana -------------------------------
+Valores digitados: Ana
+
+Olá! O Python está funcionando.
+Digite seu primeiro nome: Ana
+Bem-vindo(a) ao projeto Papelaria Ponto Certo, Ana!
+
+---- Teste 2 - aluno chamado Bruno -----------------------------
+Valores digitados: Bruno
+
+Olá! O Python está funcionando.
+Digite seu primeiro nome: Bruno
+Bem-vindo(a) ao projeto Papelaria Ponto Certo, Bruno!

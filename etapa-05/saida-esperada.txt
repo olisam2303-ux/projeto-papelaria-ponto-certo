@@ -1,0 +1,89 @@
+SAÍDA ESPERADA - ETAPA 5: Estoque (SE simples)
+================================================================
+Para comparar: rode  python etapa-05/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 5 canetas (nenhum aviso) ------------------------
+Valores digitados: Caneta / 2 / 5 / n
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta
+Preço unitário (R$): 2
+Quantidade: 5
+É estudante? (s/n): n
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta
+Quantidade: 5
+Subtotal: R$ 10.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 25.00
+Brinde: Não
+----------------------------------
+
+---- Teste 2 - 30 canetas (pedido grande) ----------------------
+Valores digitados: Caneta / 2 / 30 / n
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta
+Preço unitário (R$): 2
+Quantidade: 30
+É estudante? (s/n): n
+Aviso: pedido grande, separar com antecedência.
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta
+Quantidade: 30
+Subtotal: R$ 60.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 75.00
+Brinde: Sim
+----------------------------------
+
+---- Teste 3 - 45 canetas (falta estoque) ----------------------
+Valores digitados: Caneta / 2 / 45 / n
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta
+Preço unitário (R$): 2
+Quantidade: 45
+É estudante? (s/n): n
+ATENÇÃO: estoque insuficiente! Temos só 40 unidades.
+Aviso: pedido grande, separar com antecedência.
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta
+Quantidade: 45
+Subtotal: R$ 90.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 105.00
+Brinde: Sim
+----------------------------------
+
+---- Teste 4 - exatamente 40 canetas (limite do estoque) -------
+Valores digitados: Caneta / 2 / 40 / n
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta
+Preço unitário (R$): 2
+Quantidade: 40
+É estudante? (s/n): n
+Aviso: pedido grande, separar com antecedência.
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta
+Quantidade: 40
+Subtotal: R$ 80.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 95.00
+Brinde: Sim
+----------------------------------

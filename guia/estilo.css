@@ -1,0 +1,325 @@
+/* Guia do projeto Papelaria Ponto Certo — funciona offline, sem fontes externas. */
+:root {
+  --fundo: #f6f4ef;
+  --papel: #ffffff;
+  --tinta: #1f2430;
+  --suave: #5b6271;
+  --linha: #e3ded3;
+  --marca: #0f766e;       /* verde-azulado da papelaria */
+  --marca-claro: #e6f4f2;
+  --laranja: #c2410c;
+  --laranja-claro: #fff1e8;
+  --ok: #15803d;
+  --ok-claro: #e9f7ee;
+  --erro: #b91c1c;
+  --erro-claro: #fdecec;
+  --aviso: #92400e;
+  --aviso-claro: #fff7e0;
+  --raio: 12px;
+  --mono: Consolas, "Cascadia Mono", "Courier New", monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--fundo); color: var(--tinta);
+  font: 17px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+}
+a { color: var(--marca); }
+h1, h2, h3, h4 { line-height: 1.25; margin: 1.4em 0 .5em; }
+h1 { font-size: 2rem; margin-top: .2em; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.15rem; }
+p { margin: .6em 0; }
+code { font-family: var(--mono); font-size: .92em; background: #efece4; padding: .08em .35em; border-radius: 5px; }
+kbd {
+  font-family: var(--mono); font-size: .85em; background: #fff; border: 1px solid #c9c3b6;
+  border-bottom-width: 3px; border-radius: 6px; padding: .05em .45em; white-space: nowrap;
+}
+.pequeno { font-size: .9rem; color: var(--suave); }
+
+/* ---------- topo ---------- */
+.topo {
+  position: sticky; top: 0; z-index: 20; background: var(--marca); color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.topo-dentro { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 18px; padding: 10px 20px; }
+.logo { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 700; }
+.logo-selo {
+  width: 36px; height: 36px; border-radius: 9px; background: #fff; color: var(--marca);
+  display: grid; place-items: center; font-weight: 800; font-size: 15px;
+}
+.topo nav { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.topo nav a {
+  color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: .95rem;
+}
+.topo nav a:hover, .topo nav a.ativo { background: rgba(255,255,255,.18); }
+
+main { max-width: 1120px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* ---------- cartões e caixas ---------- */
+.cartao { background: var(--papel); border: 1px solid var(--linha); border-radius: var(--raio); padding: 20px 24px; margin: 16px 0; }
+.caixa { border-radius: 10px; padding: 12px 16px; margin: 14px 0; border-left: 5px solid; }
+.caixa > :first-child { margin-top: 0; }
+.caixa > :last-child { margin-bottom: 0; }
+.caixa.info { background: var(--marca-claro); border-color: var(--marca); }
+.caixa.atencao { background: var(--aviso-claro); border-color: #d97706; }
+.caixa.erro { background: var(--erro-claro); border-color: var(--erro); }
+.caixa.ok { background: var(--ok-claro); border-color: var(--ok); }
+.caixa.pense { background: #f1efff; border-color: #6d5bd0; }
+.caixa-titulo { font-weight: 700; display: block; margin-bottom: 4px; }
+
+/* ---------- capa ---------- */
+.capa { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: center; }
+.capa h1 { font-size: 2.3rem; }
+.capa .sub { font-size: 1.15rem; color: var(--suave); }
+.etiqueta {
+  display: inline-block; font-size: .8rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  background: var(--laranja-claro); color: var(--laranja); padding: 3px 10px; border-radius: 99px;
+}
+.ciclo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; counter-reset: ciclo; }
+.ciclo div {
+  background: var(--papel); border: 1px solid var(--linha); border-radius: 10px; padding: 14px; position: relative;
+}
+.ciclo div::before {
+  counter-increment: ciclo; content: counter(ciclo);
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--marca); color: #fff; font-weight: 700; margin-bottom: 6px;
+}
+.ciclo b { display: block; }
+
+/* ---------- mapa das etapas ---------- */
+.mapa { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.etapa-card {
+  display: block; text-decoration: none; color: inherit; background: var(--papel);
+  border: 1px solid var(--linha); border-radius: var(--raio); padding: 16px; position: relative;
+  transition: transform .12s, box-shadow .12s;
+}
+.etapa-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+.etapa-card .num { font-size: .8rem; font-weight: 700; color: var(--marca); text-transform: uppercase; }
+.etapa-card h3 { margin: 4px 0 6px; }
+.etapa-card p { margin: 0; font-size: .92rem; color: var(--suave); }
+.etapa-card .status { position: absolute; top: 14px; right: 14px; font-size: .78rem; font-weight: 700; padding: 2px 9px; border-radius: 99px; }
+.status.feito { background: var(--ok-claro); color: var(--ok); }
+.status.agora { background: var(--laranja-claro); color: var(--laranja); }
+.status.depois { background: #efece4; color: var(--suave); }
+.barra-progresso { height: 12px; background: #e7e2d6; border-radius: 99px; overflow: hidden; margin: 8px 0 4px; }
+.barra-progresso span { display: block; height: 100%; background: var(--marca); border-radius: 99px; transition: width .4s; }
+
+/* ---------- página da etapa ---------- */
+.cab-etapa { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.cab-etapa .grande { font-size: 3rem; font-weight: 800; color: var(--marca); line-height: 1; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+.chip { font-size: .82rem; background: #efece4; border-radius: 99px; padding: 2px 10px; }
+.abas { display: flex; gap: 6px; border-bottom: 2px solid var(--linha); margin: 18px 0 0; flex-wrap: wrap; }
+.aba {
+  appearance: none; border: 0; background: transparent; font: inherit; font-weight: 600; color: var(--suave);
+  padding: 10px 16px; border-radius: 10px 10px 0 0; cursor: pointer; text-decoration: none;
+  border: 2px solid transparent; border-bottom: 0; margin-bottom: -2px;
+}
+.aba:hover { color: var(--tinta); }
+.aba.ativa { color: var(--marca); background: var(--papel); border-color: var(--linha); }
+.aba .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #e7e2d6; font-size: .8rem; margin-right: 6px; }
+.aba.ativa .n { background: var(--marca); color: #fff; }
+.painel { background: var(--papel); border: 1px solid var(--linha); border-top: 0; border-radius: 0 0 var(--raio) var(--raio); padding: 8px 28px 28px; }
+
+.lado-a-lado { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+.lado-a-lado .rot { font-size: .8rem; font-weight: 700; color: var(--suave); text-transform: uppercase; margin-bottom: 4px; }
+
+pre.codigo {
+  font-family: var(--mono); font-size: 15px; line-height: 1.55; background: #1e1e1e; color: #d4d4d4;
+  border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 0;
+}
+pre.codigo.claro { background: #faf9f6; color: var(--tinta); border: 1px solid var(--linha); }
+.k { color: #c586c0; } .s { color: #ce9178; } .c { color: #6a9955; } .f { color: #dcdcaa; } .num { color: #b5cea8; }
+pre.codigo.claro .k { color: #8b20a8; } pre.codigo.claro .s { color: #a3410f; } pre.codigo.claro .c { color: #5f7f45; } pre.codigo.claro .f { color: #7a5c00; } pre.codigo.claro .num { color: #1a7a4c; }
+.lac { background: #ffd54a; color: #000; border-radius: 3px; padding: 0 2px; font-weight: 700; }
+
+table.tab { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .95rem; }
+table.tab th, table.tab td { border: 1px solid var(--linha); padding: 8px 10px; text-align: left; vertical-align: top; }
+table.tab th { background: #f3f0e8; }
+table.tab td.v { color: var(--ok); font-weight: 700; }
+table.tab td.f { color: var(--erro); font-weight: 700; }
+
+/* ---------- passos ---------- */
+.passo { border: 1px solid var(--linha); border-radius: var(--raio); margin: 18px 0; overflow: hidden; background: #fff; }
+.passo-cab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #faf8f3; border-bottom: 1px solid var(--linha); }
+.passo-num { width: 34px; height: 34px; border-radius: 50%; background: var(--marca); color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; }
+.passo-cab h3 { margin: 0; font-size: 1.08rem; flex: 1; }
+.passo-corpo { padding: 6px 20px 16px; }
+.passo.feito .passo-num { background: var(--ok); }
+.passo.feito .passo-num::after { content: "✓"; }
+.passo.feito .passo-num span { display: none; }
+.marcar { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--suave); cursor: pointer; user-select: none; white-space: nowrap; }
+.marcar input { width: 20px; height: 20px; accent-color: var(--ok); cursor: pointer; }
+ol.faca { padding-left: 1.3em; }
+ol.faca li { margin: 6px 0; }
+
+details.dica { border: 1px dashed #b8b0a0; border-radius: 10px; padding: 8px 14px; margin: 10px 0; background: #fffdf8; }
+details.dica summary { cursor: pointer; font-weight: 600; color: var(--laranja); }
+details.dica[open] summary { margin-bottom: 6px; }
+details.problema summary { color: var(--erro); }
+
+/* ---------- quiz ---------- */
+.quiz { border: 1px solid var(--linha); border-radius: var(--raio); padding: 14px 18px; margin: 14px 0; background: #fff; }
+.quiz .perg { font-weight: 600; }
+.quiz .ops { display: grid; gap: 8px; margin: 10px 0 4px; }
+.quiz button.op {
+  text-align: left; font: inherit; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--linha); background: #faf9f6; cursor: pointer;
+}
+.quiz button.op:hover { border-color: var(--marca); }
+.quiz button.op.certa { background: var(--ok-claro); border-color: var(--ok); }
+.quiz button.op.errada { background: var(--erro-claro); border-color: var(--erro); }
+.quiz .expl { display: none; margin-top: 8px; }
+.quiz.respondido .expl { display: block; }
+
+/* ---------- formulário de entrega ---------- */
+label.campo { display: block; font-weight: 600; margin: 14px 0 4px; }
+input.txt, textarea.txt {
+  width: 100%; font: inherit; padding: 10px 12px; border: 1px solid #cfc8b9; border-radius: 9px; background: #fff;
+}
+textarea.txt.mono { font-family: var(--mono); font-size: 14px; min-height: 200px; }
+input.txt:focus, textarea.txt:focus { outline: 3px solid #99d5cd; border-color: var(--marca); }
+.botao {
+  display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700; cursor: pointer;
+  background: var(--marca); color: #fff; border: 0; border-radius: 10px; padding: 11px 20px; margin: 10px 8px 0 0; text-decoration: none;
+}
+.botao:hover { filter: brightness(1.1); }
+.botao.sec { background: #fff; color: var(--marca); border: 2px solid var(--marca); }
+.botao.laranja { background: var(--laranja); }
+.botao[disabled] { opacity: .45; cursor: not-allowed; }
+.duas-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.nav-etapas { display: flex; justify-content: space-between; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+
+/* ---------- saída esperada ---------- */
+details.saida { border: 1px solid var(--linha); border-radius: 10px; margin: 8px 0; background: #fff; }
+details.saida summary { padding: 10px 14px; cursor: pointer; font-weight: 600; }
+details.saida pre { margin: 0 14px 14px; }
+
+/* ---------- TELAS (VS Code e Windows desenhados) ---------- */
+.tela { margin: 14px 0 8px; }
+.tela-legenda { font-size: .88rem; color: var(--suave); margin: 6px 2px 0; }
+.marca {
+  display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: #e11d48; color: #fff; font: 700 12px/1 "Segoe UI", sans-serif; margin: 0 3px;
+  box-shadow: 0 0 0 3px rgba(225,29,72,.25); vertical-align: middle; flex: none;
+}
+.vsc {
+  border-radius: 10px; overflow: hidden; border: 1px solid #111; background: #1e1e1e; color: #cccccc;
+  font: 13px/1.45 "Segoe UI", sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.18); user-select: none;
+}
+.vsc-titulo { display: flex; align-items: center; background: #323233; height: 32px; padding: 0 8px; gap: 2px; position: relative; }
+.vsc-icone { width: 16px; height: 16px; border-radius: 3px; background: #2f80ed; margin-right: 8px; flex: none; }
+.vsc-menu { padding: 3px 8px; border-radius: 4px; color: #cccccc; display: flex; align-items: center; }
+.vsc-menu.aberto { background: #505050; color: #fff; }
+.vsc-nome { flex: 1; min-width: 0; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #9d9d9d; font-size: 12px; padding: 0 10px; }
+.vsc-janela { display: flex; gap: 14px; color: #9d9d9d; padding-right: 4px; }
+.vsc-drop {
+  position: absolute; top: 30px; background: #252526; border: 1px solid #454545; border-radius: 6px;
+  min-width: 250px; padding: 4px 0; z-index: 3; box-shadow: 0 6px 18px rgba(0,0,0,.5);
+}
+.vsc-drop div { padding: 4px 22px; display: flex; justify-content: space-between; gap: 30px; align-items: center; }
+.vsc-drop div.sel { background: #04395e; color: #fff; outline: 1px solid #007fd4; }
+.vsc-drop hr { border: 0; border-top: 1px solid #454545; margin: 4px 0; }
+.vsc-drop .atalho { color: #9d9d9d; font-size: 12px; }
+.vsc-corpo { display: flex; min-height: 220px; }
+.vsc-ativ { width: 44px; background: #333333; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 12px; flex: none; }
+.vsc-ativ i { width: 22px; height: 22px; border: 2px solid #858585; border-radius: 4px; display: block; }
+.vsc-ativ i.on { border-color: #fff; }
+.vsc-lateral { width: 230px; background: #252526; flex: none; font-size: 13px; }
+.vsc-lateral-tit { padding: 8px 12px 6px 20px; font-size: 11px; letter-spacing: .04em; color: #bbbbbb; display: flex; align-items: center; }
+.vsc-pasta { padding: 2px 0 2px 8px; font-weight: 700; font-size: 11px; color: #cccccc; display: flex; align-items: center; }
+.vsc-item { padding: 1px 8px; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+.vsc-item.sel { background: #37373d; color: #fff; outline: 1px solid #007fd4; outline-offset: -1px; }
+.vsc-item .ic { width: 14px; text-align: center; color: #c5c5c5; font-size: 11px; }
+.vsc-item .ic.py { color: #e8c547; font-weight: 700; }
+.vsc-item .ic.txt { color: #8db3d6; }
+.vsc-principal { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.vsc-abas { display: flex; background: #252526; height: 35px; flex: none; }
+.vsc-aba { background: #2d2d2d; color: #969696; padding: 0 14px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #252526; }
+.vsc-aba.on { background: #1e1e1e; color: #fff; border-top: 1px solid #0078d4; }
+.vsc-aba .x { color: #c5c5c5; }
+.vsc-aba .ponto { width: 8px; height: 8px; border-radius: 50%; background: #c5c5c5; display: inline-block; }
+.vsc-editor { flex: 1; font-family: var(--mono); font-size: 13px; line-height: 19px; padding: 6px 0; overflow: hidden; }
+.vsc-linha { display: flex; white-space: pre; }
+.vsc-linha .nl { width: 46px; text-align: right; padding-right: 16px; color: #6e7681; flex: none; }
+.vsc-linha.realce { background: rgba(255, 213, 74, .14); }
+.vsc-linha.realce .nl { color: #ffd54a; }
+.vsc-reticencias { color: #6e7681; padding-left: 62px; font-family: var(--mono); }
+.vsc-painel { border-top: 1px solid #414141; background: #181818; flex: none; }
+.vsc-painel-abas { display: flex; gap: 18px; padding: 6px 14px 0; font-size: 11px; letter-spacing: .04em; color: #9d9d9d; align-items: center; }
+.vsc-painel-abas span.on { color: #e7e7e7; border-bottom: 1px solid #e7e7e7; padding-bottom: 4px; }
+.vsc-term { font-family: var(--mono); font-size: 13px; line-height: 18px; padding: 8px 14px 10px; white-space: pre-wrap; word-break: break-word; color: #cccccc; }
+.vsc-term .pr { color: #cccccc; }
+.vsc-term .cmd { color: #ffe066; }
+.vsc-term .ok { color: #23d18b; }
+.vsc-term .er { color: #f14c4c; }
+.vsc-term .am { color: #f5f543; }
+.vsc-term .di { color: #d7ba7d; }
+.vsc-term .dig { color: #6fc3ff; }
+.vsc-term .cursor { display: inline-block; width: 8px; height: 15px; background: #cccccc; vertical-align: -2px; }
+.vsc-status { background: #007acc; color: #fff; height: 22px; display: flex; align-items: center; gap: 14px; padding: 0 10px; font-size: 12px; }
+.vsc-status .dir { margin-left: auto; display: flex; gap: 14px; }
+.vsc-vazio { flex: 1; display: grid; place-items: center; color: #6b6b6b; font-size: 14px; padding: 30px; text-align: center; }
+
+.dialogo-fundo { background: #1e1e1e; padding: 26px; display: grid; place-items: center; border-radius: 10px; border: 1px solid #111; }
+.dialogo {
+  background: #252526; color: #cccccc; border: 1px solid #454545; border-radius: 8px; width: min(520px, 100%);
+  padding: 18px 20px; box-shadow: 0 8px 24px rgba(0,0,0,.5); font: 13px/1.5 "Segoe UI", sans-serif;
+}
+.dialogo h4 { margin: 0 0 8px; color: #fff; font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.dialogo .escudo { width: 26px; height: 26px; border-radius: 6px; background: #0078d4; flex: none; }
+.dialogo .botoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }
+.dialogo .b { padding: 5px 12px; border-radius: 4px; background: #3a3d41; color: #fff; display: flex; align-items: center; }
+.dialogo .b.pri { background: #0078d4; }
+.dialogo label { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
+
+.win {
+  border-radius: 8px; overflow: hidden; border: 1px solid #bdbdbd; background: #fff; color: #1b1b1b;
+  font: 13px/1.45 "Segoe UI", sans-serif; box-shadow: 0 10px 28px rgba(0,0,0,.18); user-select: none;
+}
+.win-tit { background: #f3f3f3; padding: 8px 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #e0e0e0; }
+.win-barra { display: flex; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #ececec; align-items: center; }
+.win-end { flex: 1; border: 1px solid #d0d0d0; border-radius: 4px; padding: 3px 8px; color: #333; }
+.win-corpo { display: flex; min-height: 150px; }
+.win-lado { width: 170px; background: #fafafa; border-right: 1px solid #ececec; padding: 8px; color: #333; }
+.win-lado div { padding: 3px 6px; }
+.win-lista { flex: 1; padding: 6px 10px; }
+.win-lista div { padding: 4px 8px; display: flex; gap: 8px; align-items: center; border-radius: 4px; }
+.win-lista div.sel { background: #cce8ff; outline: 1px solid #99d1ff; }
+.win-pasta { width: 16px; height: 12px; background: #f2c55c; border-radius: 2px; display: inline-block; }
+.win-zip { width: 14px; height: 16px; background: #f2c55c; border: 2px dashed #9a7a20; border-radius: 2px; display: inline-block; }
+.win-rodape { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 12px; border-top: 1px solid #ececec; background: #f9f9f9; align-items: center; }
+.win-b { border: 1px solid #c4c4c4; background: #fdfdfd; padding: 4px 16px; border-radius: 4px; display: flex; align-items: center; }
+.win-b.pri { background: #0067c0; color: #fff; border-color: #0067c0; }
+.win-menu { position: relative; display: inline-block; margin: 10px 0 0 60px; background: #f9f9f9; border: 1px solid #d6d6d6; border-radius: 8px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
+.win-menu div { padding: 5px 30px 5px 12px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+.win-menu div.sel { background: #e5f1fb; }
+
+/* ---------- ajuda ---------- */
+.problemas details { background: #fff; border: 1px solid var(--linha); border-radius: 10px; margin: 10px 0; padding: 10px 16px; }
+.problemas summary { cursor: pointer; font-weight: 700; }
+.problemas summary code { font-weight: 400; }
+
+/* ---------- aviso de ordem ---------- */
+.aviso-ordem { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+/* ---------- comprovante (só na impressão) ---------- */
+#comprovante { display: none; }
+@media print {
+  @page { size: A4; margin: 16mm 14mm; }
+  body { background: #fff; font-size: 11pt; }
+  .topo, main, .nao-imprimir { display: none !important; }
+  #comprovante { display: block; }
+  #comprovante h1 { font-size: 18pt; margin: 0 0 4pt; }
+  #comprovante .linha-dados { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 16pt; margin: 10pt 0; }
+  #comprovante .selo { border: 2px solid #15803d; color: #15803d; display: inline-block; padding: 4pt 10pt; border-radius: 6pt; font-weight: 700; }
+  #comprovante pre { white-space: pre-wrap; font: 8.5pt/1.35 Consolas, monospace; border: 1px solid #999; padding: 8pt; border-radius: 4pt; }
+  #comprovante .bloco { break-inside: avoid; margin: 10pt 0; }
+}
+
+@media (max-width: 820px) {
+  .capa, .lado-a-lado, .duas-col { grid-template-columns: 1fr; }
+  .ciclo { grid-template-columns: 1fr 1fr; }
+  .vsc-lateral { display: none; }
+  .painel { padding: 6px 14px 20px; }
+}

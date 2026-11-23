@@ -1,0 +1,85 @@
+SAÍDA ESPERADA - ETAPA 4: Estudante e brinde (E / OU)
+================================================================
+Para comparar: rode  python etapa-04/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 12 lápis, estudante, compra pequena -------------
+Valores digitados: Lápis / 1.50 / 12 / s
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Lápis
+Preço unitário (R$): 1.50
+Quantidade: 12
+É estudante? (s/n): s
+----------------------------------
+RESUMO DA VENDA
+Produto: Lápis
+Quantidade: 12
+Subtotal: R$ 18.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 33.00
+Brinde: Sim
+----------------------------------
+
+---- Teste 2 - 2 cadernos, estudante, compra de R$ 50,00 -------
+Valores digitados: Caderno / 25 / 2 / s
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): s
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 5.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 60.00
+Brinde: Não
+----------------------------------
+
+---- Teste 3 - 2 cadernos, NÃO estudante -----------------------
+Valores digitados: Caderno / 25 / 2 / n
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+----------------------------------
+
+---- Teste 4 - 2 mochilas, estudante digitou S maiúsculo -------
+Valores digitados: Mochila / 150 / 2 / S
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Mochila
+Preço unitário (R$): 150
+Quantidade: 2
+É estudante? (s/n): S
+----------------------------------
+RESUMO DA VENDA
+Produto: Mochila
+Quantidade: 2
+Subtotal: R$ 300.00
+Desconto por valor: R$ 15.00
+Desconto estudante: R$ 5.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 280.00
+Brinde: Sim
+----------------------------------

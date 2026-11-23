@@ -1,0 +1,137 @@
+SAÍDA ESPERADA - ETAPA 7: Forma de pagamento (SE-SENÃO-SE)
+================================================================
+Para comparar: rode  python etapa-07/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - pagamento em dinheiro ---------------------------
+Valores digitados: Caderno / 25 / 2 / n / (só Enter) / 1
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): 
+Formas de pagamento: 1-Dinheiro  2-PIX  3-Cartão
+Escolha (1, 2 ou 3): 1
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+Pagamento: Dinheiro
+VENDA CONCLUÍDA
+----------------------------------
+
+---- Teste 2 - pagamento com PIX -------------------------------
+Valores digitados: Caderno / 25 / 2 / n / (só Enter) / 2
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): 
+Formas de pagamento: 1-Dinheiro  2-PIX  3-Cartão
+Escolha (1, 2 ou 3): 2
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+Pagamento: PIX
+VENDA CONCLUÍDA
+----------------------------------
+
+---- Teste 3 - pagamento com cartão ----------------------------
+Valores digitados: Caderno / 25 / 2 / n / (só Enter) / 3
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): 
+Formas de pagamento: 1-Dinheiro  2-PIX  3-Cartão
+Escolha (1, 2 ou 3): 3
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+Pagamento: Cartão
+VENDA CONCLUÍDA
+----------------------------------
+
+---- Teste 4 - opção que não existe ----------------------------
+Valores digitados: Caderno / 25 / 2 / n / (só Enter) / 9
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 25
+Quantidade: 2
+É estudante? (s/n): n
+Cupom (ou Enter para pular): 
+Formas de pagamento: 1-Dinheiro  2-PIX  3-Cartão
+Escolha (1, 2 ou 3): 9
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 2
+Subtotal: R$ 50.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 65.00
+Brinde: Não
+Pagamento: Inválida
+VENDA CANCELADA
+----------------------------------
+
+---- Teste 5 - 45 canetas: falta estoque -----------------------
+Valores digitados: Caneta / 2 / 45 / n / (só Enter) / 1
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta
+Preço unitário (R$): 2
+Quantidade: 45
+É estudante? (s/n): n
+ATENÇÃO: estoque insuficiente! Temos só 40 unidades.
+Aviso: pedido grande, separar com antecedência.
+Cupom (ou Enter para pular): 
+Formas de pagamento: 1-Dinheiro  2-PIX  3-Cartão
+Escolha (1, 2 ou 3): 1
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta
+Quantidade: 45
+Subtotal: R$ 90.00
+Desconto por valor: R$ 0.00
+Desconto estudante: R$ 0.00
+Cupom: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 105.00
+Brinde: Sim
+Pagamento: Dinheiro
+VENDA CANCELADA
+----------------------------------

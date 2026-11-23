@@ -1,0 +1,90 @@
+SAÍDA ESPERADA - ETAPA 3: Desconto por valor (SE dentro de SE)
+================================================================
+Para comparar: rode  python etapa-03/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - compra de R$ 80,00 (sem desconto) ---------------
+Valores digitados: Caderno / 20 / 4
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 20
+Quantidade: 4
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 4
+Subtotal: R$ 80.00
+Desconto por valor: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 95.00
+----------------------------------
+
+---- Teste 2 - compra de R$ 150,00 (5%) ------------------------
+Valores digitados: Calculadora / 75 / 2
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Calculadora
+Preço unitário (R$): 75
+Quantidade: 2
+----------------------------------
+RESUMO DA VENDA
+Produto: Calculadora
+Quantidade: 2
+Subtotal: R$ 150.00
+Desconto por valor: R$ 7.50
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 157.50
+----------------------------------
+
+---- Teste 3 - compra de R$ 600,00 (10%) -----------------------
+Valores digitados: Kit escolar / 120 / 5
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Kit escolar
+Preço unitário (R$): 120
+Quantidade: 5
+----------------------------------
+RESUMO DA VENDA
+Produto: Kit escolar
+Quantidade: 5
+Subtotal: R$ 600.00
+Desconto por valor: R$ 60.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 540.00
+----------------------------------
+
+---- Teste 4 - compra de exatamente R$ 100,00 (limite) ---------
+Valores digitados: Estojo / 25 / 4
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Estojo
+Preço unitário (R$): 25
+Quantidade: 4
+----------------------------------
+RESUMO DA VENDA
+Produto: Estojo
+Quantidade: 4
+Subtotal: R$ 100.00
+Desconto por valor: R$ 0.00
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 115.00
+----------------------------------
+
+---- Teste 5 - compra de exatamente R$ 500,00 (limite) ---------
+Valores digitados: Mochila / 250 / 2
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Mochila
+Preço unitário (R$): 250
+Quantidade: 2
+----------------------------------
+RESUMO DA VENDA
+Produto: Mochila
+Quantidade: 2
+Subtotal: R$ 500.00
+Desconto por valor: R$ 25.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 475.00
+----------------------------------

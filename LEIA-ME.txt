@@ -1,0 +1,27 @@
+PROJETO PAPELARIA PONTO CERTO - Lógica de Programação, 1º bimestre
+====================================================================
+
+COMO COMEÇAR
+1. Dê dois cliques no arquivo index.html desta pasta. O guia abre no
+   navegador e funciona SEM internet.
+2. No guia, comece pela Etapa 0. Ela ensina a abrir esta pasta no VS Code
+   e a rodar o primeiro programa.
+
+O QUE TEM AQUI
+  index.html        o guia do projeto (teoria, prática e entrega)
+  guia/             arquivos do guia (não mexa)
+  etapa-00 a 07/    uma pasta por etapa, cada uma com:
+      papelaria.py        o programa que VOCÊ completa (na etapa 0: ola.py)
+      verificar.py        o conferidor: só rode, não altere
+      saida-esperada.txt  o que deve aparecer na tela, para comparar
+
+COMANDOS (no terminal do VS Code, com esta pasta aberta)
+  python etapa-01/papelaria.py     roda o seu programa
+  python etapa-01/verificar.py     confere o seu programa
+  (Se "python" não funcionar, use "py" no lugar.)
+
+IMPORTANTE
+  - Abra no VS Code a pasta papelaria-ponto-certo inteira
+    (Arquivo > Abrir Pasta...), não uma pasta de etapa.
+  - Salve sempre com Ctrl+S antes de rodar.
+  - Antes de sair do computador, gere o comprovante em PDF da etapa.

@@ -1,0 +1,4 @@
+# Nunca publicar: gabaritos, programa-mestre (contém as respostas) e build
+professor/
+fonte/
+node_modules/

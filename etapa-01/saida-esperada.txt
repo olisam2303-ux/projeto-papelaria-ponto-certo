@@ -1,0 +1,47 @@
+SAÍDA ESPERADA - ETAPA 1: Entrada e subtotal
+================================================================
+Para comparar: rode  python etapa-01/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 3 cadernos de R$ 12,50 --------------------------
+Valores digitados: Caderno / 12.50 / 3
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caderno
+Preço unitário (R$): 12.50
+Quantidade: 3
+----------------------------------
+RESUMO DA VENDA
+Produto: Caderno
+Quantidade: 3
+Subtotal: R$ 37.50
+----------------------------------
+
+---- Teste 2 - 10 canetas de R$ 2,50 (digitado com vírgula) ----
+Valores digitados: Caneta azul / 2,50 / 10
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Caneta azul
+Preço unitário (R$): 2,50
+Quantidade: 10
+----------------------------------
+RESUMO DA VENDA
+Produto: Caneta azul
+Quantidade: 10
+Subtotal: R$ 25.00
+----------------------------------
+
+---- Teste 3 - 1 mochila de R$ 89,90 ---------------------------
+Valores digitados: Mochila / 89.90 / 1
+
+=== PAPELARIA PONTO CERTO ===
+Produto: Mochila
+Preço unitário (R$): 89.90
+Quantidade: 1
+----------------------------------
+RESUMO DA VENDA
+Produto: Mochila
+Quantidade: 1
+Subtotal: R$ 89.90
+----------------------------------
