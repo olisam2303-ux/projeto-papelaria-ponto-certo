@@ -15,7 +15,13 @@
   let estado = ler();
   function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) { /* navegador sem armazenamento */ } }
   const concluida = (n) => !!(estado.etapas[n] && estado.etapas[n].codigo);
-  const proxima = () => { for (let n = 0; n < TOTAL; n++) if (!concluida(n)) return n; return TOTAL - 1; };
+  // próxima etapa: a seguinte à última concluída (quem começou no 2º bimestre não volta para a Etapa 0)
+  const proxima = () => { let ult = -1; for (let n = 0; n < TOTAL; n++) if (concluida(n)) ult = n; return Math.min(ult + 1, TOTAL - 1); };
+  const BIMESTRES = [
+    { b: 1, nome: "1º bimestre · O Caixa", semanas: "Semanas 01 a 07", pdf: "Apostila_Guia_Papelaria_Ponto_Certo_1bim.pdf" },
+    { b: 2, nome: "2º bimestre · O Caixa que repete", semanas: "Semanas 08 a 14", pdf: "Apostila_Guia_Papelaria_Ponto_Certo_2bim.pdf" },
+  ];
+  const bimDe = (n) => (n <= 7 ? 1 : 2);
 
   // ---------- código de conclusão (idêntico ao do verificar.py) ----------
   const ESPACOS = new Set([" ", "\t", "\r", "\n", "\f", "\v", " ", "﻿"]);
@@ -33,7 +39,9 @@
     return [...saida].filter((c) => !ESPACOS.has(c)).join("");
   }
   function codigoConclusao(etapa, fonte) {
-    const bytes = new TextEncoder().encode("PPC|" + etapa + "|" + limparCodigo(fonte.replace(/^﻿/, "")));
+    // fonte: o texto do programa, ou uma lista de textos (etapas com mais de um arquivo)
+    const limpo = Array.isArray(fonte) ? fonte.map((f) => limparCodigo(f.replace(/^﻿/, ""))).join("|") : limparCodigo(fonte.replace(/^﻿/, ""));
+    const bytes = new TextEncoder().encode("PPC|" + etapa + "|" + limpo);
     let h = 0x811c9dc5;
     for (const b of bytes) { h ^= b; h = Math.imul(h, 0x01000193) >>> 0; }
     const x = h.toString(16).toUpperCase().padStart(8, "0");
@@ -73,15 +81,15 @@
     return `
     <section class="capa">
       <div>
-        <span class="etiqueta">Lógica de Programação · 1º bimestre</span>
+        <span class="etiqueta">Lógica de Programação · 1º e 2º bimestres</span>
         <h1>Projeto Papelaria Ponto Certo</h1>
-        <p class="sub">Em 8 etapas, uma por semana, você vai construir em Python o <b>caixa de uma papelaria</b>. Cada etapa acrescenta uma parte nova ao mesmo programa, até o <b>Caixa v1</b> ficar completo.</p>
+        <p class="sub">Uma etapa por semana, você constrói em Python o <b>caixa de uma papelaria</b>. No 1º bimestre nasce o <b>Caixa v1</b> (uma venda com decisões); no 2º, o <b>Caixa v2</b> (várias compras, listas, matriz e funções).</p>
         ${barra()}
-        <a class="botao" href="#etapa-${p}">${concluida(0) ? "Continuar: Etapa " + p : "Começar pela Etapa 0"} →</a>
-        <a class="botao sec" href="Apostila_Guia_Papelaria_Ponto_Certo_1bim.pdf" target="_blank" rel="noopener">📄 Apostila em PDF</a>
+        <a class="botao" href="#etapa-${p}">${p > 0 ? "Continuar: Etapa " + p : "Começar pela Etapa 0"} →</a>
+        ${BIMESTRES.map((x) => `<a class="botao sec" href="${x.pdf}" target="_blank" rel="noopener">📄 Apostila ${x.b}º bim.</a>`).join(" ")}
         <a class="botao sec" href="#ajuda">Problemas comuns</a>
       </div>
-      <div>${T.terminal(tela.slice(0, 30), "Assim fica o caixa no fim do bimestre (uma venda com PIX).")}</div>
+      <div>${T.terminal(tela.slice(0, 30), "O Caixa v1, no fim do 1º bimestre (uma venda com PIX).")}</div>
     </section>
 
     <h2>Como cada etapa funciona</h2>
@@ -96,7 +104,7 @@
       (location.protocol === "file:" ? "" : `<p><a class="botao" href="Instalar_Papelaria_Ponto_Certo.exe" download>⬇ Instalador para Windows (.exe)</a> <a class="botao sec" href="papelaria-ponto-certo.zip" download>⬇ Pasta do projeto (.zip)</a></p><p class="pequeno">Baixe uma vez só (ou pegue no pen drive do professor) e siga a Etapa 0. O instalador copia tudo para Documentos e cria um atalho do guia; o .zip é a alternativa se o computador bloquear programas.</p>`))}
 
     <h2>As etapas</h2>
-    <div class="mapa">${ETAPAS.map((e) => `<a class="etapa-card" href="#etapa-${e.n}">${statusDe(e.n)}<div class="num">Etapa ${e.n} · ${e.semana}</div><h3>${esc(e.titulo)}</h3><p>${e.resumo}</p></a>`).join("")}</div>
+    ${BIMESTRES.map((x) => `<h3>${x.nome} <span class="pequeno">(${x.semanas})</span></h3><div class="mapa">${ETAPAS.filter((e) => bimDe(e.n) === x.b).map((e) => `<a class="etapa-card" href="#etapa-${e.n}">${statusDe(e.n)}<div class="num">Etapa ${e.n} · ${e.semana}</div><h3>${esc(e.titulo)}</h3><p>${e.resumo}</p></a>`).join("")}</div>`).join("")}
 
     <h2>Seus dados</h2>
     <div class="cartao"><p>Eles aparecem no comprovante de cada etapa. Ficam guardados só neste navegador.</p>
@@ -137,7 +145,7 @@
       : "";
     return `
       <div class="cab-etapa"><div class="grande">${n}</div><div style="flex:1;min-width:260px">
-        <div class="chips"><span class="chip">${e.semana}</span><span class="chip">Apostila: ${e.tema}</span><span class="chip">Pasta: etapa-0${n}</span>${concluida(n) ? '<span class="chip" style="background:#e9f7ee;color:#15803d">✓ Concluída</span>' : ""}</div>
+        <div class="chips"><span class="chip">${e.semana}</span><span class="chip">Apostila: ${e.tema}</span><span class="chip">Pasta: ${T.pastaDe(n)}</span>${concluida(n) ? '<span class="chip" style="background:#e9f7ee;color:#15803d">✓ Concluída</span>' : ""}</div>
         <h1>${esc(e.titulo)}</h1><p class="sub" style="color:#5b6271;margin:0">${e.resumo}</p></div></div>
       ${aviso}
       <nav class="abas">${abas}</nav>
@@ -152,11 +160,11 @@
     return `
       <h2>1. Confira com o verificador</h2>
       <p>No terminal do VS Code, rode o verificador desta etapa e corrija até aparecer <b>PARABÉNS</b>:</p>
-      ${T.cmd(`python etapa-0${n}/verificar.py`)}
-      <p class="pequeno">Se no seu computador funciona <code>py</code>, use <code>py etapa-0${n}/verificar.py</code>.</p>
+      ${T.cmd(`python ${T.pastaDe(n)}/verificar.py`)}
+      <p class="pequeno">Se no seu computador funciona <code>py</code>, use <code>py ${T.pastaDe(n)}/verificar.py</code>.</p>
 
       <h2>2. Compare com a saída esperada</h2>
-      <p>É o mesmo conteúdo do arquivo <code>etapa-0${n}/saida-esperada.txt</code>. Rode <code>python etapa-0${n}/${arq}</code>, digite os valores de um teste e veja se o seu terminal fica igual.</p>
+      <p>É o mesmo conteúdo do arquivo <code>${T.pastaDe(n)}/saida-esperada.txt</code>. Rode <code>python ${T.pastaDe(n)}/${arq}</code>, digite os valores de um teste e veja se o seu terminal fica igual.</p>
       ${testes(n)}
 
       <h2>3. Entregue</h2>
@@ -164,9 +172,9 @@
       <form class="cartao" id="formEntrega" autocomplete="off">
         <div class="duas-col"><div><label class="campo" for="fNome">Nome completo</label><input class="txt" id="fNome" required value="${esc(estado.aluno.nome)}"></div>
         <div><label class="campo" for="fTurma">Turma</label><input class="txt" id="fTurma" required value="${esc(estado.aluno.turma)}"></div></div>
-        <label class="campo" for="fPrograma">Cole aqui o seu ${esc(arq)} inteiro</label>
-        <p class="pequeno" style="margin:0 0 6px">No VS Code, clique dentro do arquivo, aperte <kbd>Ctrl</kbd>+<kbd>A</kbd> (seleciona tudo) e <kbd>Ctrl</kbd>+<kbd>C</kbd> (copia). Aqui, clique na caixa e aperte <kbd>Ctrl</kbd>+<kbd>V</kbd>.</p>
-        <textarea class="txt mono" id="fPrograma" required spellcheck="false">${esc(reg.programa || "")}</textarea>
+        ${arquivosDe(n).map((a, i) => `<label class="campo" for="fPrograma${i}">Cole aqui o seu ${esc(a)} inteiro</label>
+        <p class="pequeno" style="margin:0 0 6px">No VS Code, clique dentro do arquivo <b>${esc(a)}</b>, aperte <kbd>Ctrl</kbd>+<kbd>A</kbd> (seleciona tudo) e <kbd>Ctrl</kbd>+<kbd>C</kbd> (copia). Aqui, clique na caixa e aperte <kbd>Ctrl</kbd>+<kbd>V</kbd>.</p>
+        <textarea class="txt mono" id="fPrograma${i}" data-programa="${i}" required spellcheck="false">${esc(programasDe(reg)[i] || "")}</textarea>`).join("")}
         <label class="campo" for="fCodigo">Código de conclusão mostrado pelo verificador</label>
         <input class="txt" id="fCodigo" required placeholder="E${n}-XXXX-XXXX" value="${esc(reg.codigo || "")}" style="font-family:var(--mono);max-width:260px;text-transform:uppercase">
         <label class="campo" for="fReflexao">Em 2 a 4 linhas: o que você aprendeu nesta etapa?</label>
@@ -183,18 +191,21 @@
       ${e.fim || ""}`;
   }
 
+  const arquivosDe = (n) => (window.KIT[n].arquivos ? window.KIT[n].arquivos.map((x) => x.nome) : [window.KIT[n].arquivo]);
+  const programasDe = (reg) => (reg.programas ? reg.programas : reg.programa ? [reg.programa] : []);
+
   // ---------- comprovante ----------
   function montarComprovante(n) {
     const reg = estado.etapas[n];
     const e = ETAPAS[n];
     $("#comprovante").innerHTML = `
       <h1>Comprovante · Etapa ${n}: ${esc(e.titulo)}</h1>
-      <div>Projeto Papelaria Ponto Certo · Lógica de Programação · 1º bimestre · ${esc(e.semana)}</div>
+      <div>Projeto Papelaria Ponto Certo · Lógica de Programação · ${bimDe(n)}º bimestre · ${esc(e.semana)}</div>
       <div class="linha-dados"><div><b>Aluno(a):</b> ${esc(reg.nome)}</div><div><b>Turma:</b> ${esc(reg.turma)}</div>
       <div><b>Validado em:</b> ${esc(reg.data)}</div><div><b>Código de conclusão:</b> ${esc(reg.codigo)}</div></div>
       <div class="selo">✓ Programa aprovado pelo verificador da Etapa ${n}</div>
       <div class="bloco"><h3>O que aprendi</h3><p>${esc(reg.reflexao).replace(/\n/g, "<br>")}</p></div>
-      <div class="bloco"><h3>Programa entregue (${esc(window.KIT[n].arquivo)})</h3><pre>${esc(reg.programa)}</pre></div>`;
+      ${arquivosDe(n).map((a, i) => `<div class="bloco"><h3>Programa entregue (${esc(a)})</h3><pre>${esc(programasDe(reg)[i] || "")}</pre></div>`).join("")}`;
   }
 
   // ---------- roteamento ----------
@@ -253,21 +264,22 @@
     ev.preventDefault();
     const n = Number(location.hash.match(/etapa-(\d+)/)[1]);
     const nome = $("#fNome").value.trim(), turma = $("#fTurma").value.trim();
-    const programa = $("#fPrograma").value, reflexao = $("#fReflexao").value.trim();
+    const programas = [...document.querySelectorAll("textarea[data-programa]")].map((t) => t.value);
+    const programa = programas.join("\n"), reflexao = $("#fReflexao").value.trim();
     const digitado = $("#fCodigo").value.trim().toUpperCase().replace(/\s+/g, "");
     const res = $("#resultado");
     const erro = (t, h) => { res.innerHTML = T.caixa("erro", t, h); };
-    if (!programa.trim()) return erro("Falta colar o programa.", "");
+    if (programas.some((p) => !p.trim())) return erro(programas.length > 1 ? "Falta colar um dos arquivos." : "Falta colar o programa.", "");
     if (programa.includes("___")) return erro("O programa colado ainda tem lacuna ___.", "<p>Complete, salve, rode o verificador e copie de novo.</p>");
-    const m = digitado.match(/^E(\d)-[0-9A-F]{4}-[0-9A-F]{4}$/);
+    const m = digitado.match(/^E(\d+)-[0-9A-F]{4}-[0-9A-F]{4}$/);
     if (!m) return erro("O código de conclusão está incompleto.", `<p>Ele tem este formato: <b>E${n}-XXXX-XXXX</b> (letra E, número da etapa, e dois grupos de 4 letras ou números). Copie direto do terminal.</p>`);
-    if (Number(m[1]) !== n) return erro(`Este código é da Etapa ${m[1]}, não da Etapa ${n}.`, `<p>Rode <code>python etapa-0${n}/verificar.py</code> e use o código que ele mostrar.</p>`);
-    if (codigoConclusao(n, programa) !== digitado) {
-      return erro("O código não combina com o programa colado.", `<ul><li>Você mudou o programa <b>depois</b> de rodar o verificador? Salve, rode o verificador de novo e copie o código novo.</li><li>Colou o arquivo <b>inteiro</b> (<kbd>Ctrl</kbd>+<kbd>A</kbd> antes de <kbd>Ctrl</kbd>+<kbd>C</kbd>)? E o arquivo é o da pasta <b>etapa-0${n}</b>?</li><li>Confira se digitou o código sem trocar letras (ex.: 0 e O, 8 e B).</li></ul>`);
+    if (Number(m[1]) !== n) return erro(`Este código é da Etapa ${m[1]}, não da Etapa ${n}.`, `<p>Rode <code>python ${T.pastaDe(n)}/verificar.py</code> e use o código que ele mostrar.</p>`);
+    if (codigoConclusao(n, programas.length > 1 ? programas : programas[0]) !== digitado) {
+      return erro("O código não combina com o programa colado.", `<ul><li>Você mudou o programa <b>depois</b> de rodar o verificador? Salve, rode o verificador de novo e copie o código novo.</li><li>Colou o arquivo <b>inteiro</b> (<kbd>Ctrl</kbd>+<kbd>A</kbd> antes de <kbd>Ctrl</kbd>+<kbd>C</kbd>)? E o arquivo é o da pasta <b>${T.pastaDe(n)}</b>?</li><li>Confira se digitou o código sem trocar letras (ex.: 0 e O, 8 e B).</li></ul>`);
     }
     const agora = new Date();
     estado.aluno = { nome, turma };
-    estado.etapas[n] = { codigo: digitado, programa, reflexao, nome, turma, data: agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) };
+    estado.etapas[n] = { codigo: digitado, programa, programas, reflexao, nome, turma, data: agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) };
     salvar();
     rota();
     const r2 = $("#resultado");

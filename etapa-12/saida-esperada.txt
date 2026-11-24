@@ -1,0 +1,155 @@
+SAÍDA ESPERADA - ETAPA 12: Relatório da semana (matriz)
+================================================================
+Para comparar: rode  python etapa-12/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 3 itens, 3 parcelas, com relatório --------------
+Valores digitados: Ana / Caderno / 25 / Caneta / 2,50 / Mochila / 150 / (só Enter) / 3 / s
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Ana
+Item (ou Enter para fechar a compra): Caderno
+Preço (R$): 25
+Item (ou Enter para fechar a compra): Caneta
+Preço (R$): 2,50
+Item (ou Enter para fechar a compra): Mochila
+Preço (R$): 150
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Ana
+===
+NOTA:
+1. Caderno: R$ 25.00
+2. Caneta: R$ 2.50
+3. Mochila: R$ 150.00
+Itens: 3
+Subtotal: R$ 177.50
+Preço médio por item: R$ 59.17
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 192.50
+Itens de R$ 50,00 ou mais: 1
+Conferir com o gerente: Mochila
+Item mais caro: R$ 150.00
+Item mais barato: R$ 2.50
+Do mais barato ao mais caro:
+  Caneta: R$ 2.50
+  Caderno: R$ 25.00
+  Mochila: R$ 150.00
+----------------------------------
+Em quantas parcelas (1 a 6)? 3
+Parcela 1 de 3: R$ 64.17
+Parcela 2 de 3: R$ 64.17
+Parcela 3 de 3: R$ 64.17
+Ver o relatório da semana? (s/n): s
+RELATÓRIO DA SEMANA (unidades vendidas)
+Cadernos: 65
+Canetas: 180
+Mochilas: 10
+Total da semana: 255
+Melhor dia: Sex (74 unidades)
+
+---- Teste 2 - compra vazia (só Enter) -------------------------
+Valores digitados: Carla / (só Enter) / 2 / n
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Carla
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Carla
+=====
+NOTA:
+Itens: 0
+Subtotal: R$ 0.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 0.00
+Itens de R$ 50,00 ou mais: 0
+----------------------------------
+Em quantas parcelas (1 a 6)? 2
+Parcela 1 de 2: R$ 0.00
+Parcela 2 de 2: R$ 0.00
+Ver o relatório da semana? (s/n): n
+
+---- Teste 3 - 4 agendas = R$ 200,00, parcelas inválidas -------
+Valores digitados: Ana Paula / Agenda / 50 / Agenda / 50 / Agenda / 50 / Agenda / 50 / (só Enter) / 7 / n
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Ana Paula
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Ana Paula
+=========
+NOTA:
+1. Agenda: R$ 50.00
+2. Agenda: R$ 50.00
+3. Agenda: R$ 50.00
+4. Agenda: R$ 50.00
+Itens: 4
+Subtotal: R$ 200.00
+Preço médio por item: R$ 50.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 200.00
+Itens de R$ 50,00 ou mais: 4
+Item mais caro: R$ 50.00
+Item mais barato: R$ 50.00
+Do mais barato ao mais caro:
+  Agenda: R$ 50.00
+  Agenda: R$ 50.00
+  Agenda: R$ 50.00
+  Agenda: R$ 50.00
+----------------------------------
+Em quantas parcelas (1 a 6)? 7
+Número de parcelas inválido: será 1 parcela.
+Parcela 1 de 1: R$ 200.00
+Ver o relatório da semana? (s/n): n
+
+---- Teste 4 - dois itens acima de R$ 100,00 -------------------
+Valores digitados: Davi / Mochila / 150 / Calculadora / 120 / Caderno / 25 / (só Enter) / 1 / S
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Davi
+Item (ou Enter para fechar a compra): Mochila
+Preço (R$): 150
+Item (ou Enter para fechar a compra): Calculadora
+Preço (R$): 120
+Item (ou Enter para fechar a compra): Caderno
+Preço (R$): 25
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Davi
+====
+NOTA:
+1. Mochila: R$ 150.00
+2. Calculadora: R$ 120.00
+3. Caderno: R$ 25.00
+Itens: 3
+Subtotal: R$ 295.00
+Preço médio por item: R$ 98.33
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 295.00
+Itens de R$ 50,00 ou mais: 2
+Conferir com o gerente: Mochila
+Item mais caro: R$ 150.00
+Item mais barato: R$ 25.00
+Do mais barato ao mais caro:
+  Caderno: R$ 25.00
+  Calculadora: R$ 120.00
+  Mochila: R$ 150.00
+----------------------------------
+Em quantas parcelas (1 a 6)? 1
+Parcela 1 de 1: R$ 295.00
+Ver o relatório da semana? (s/n): S
+RELATÓRIO DA SEMANA (unidades vendidas)
+Cadernos: 65
+Canetas: 180
+Mochilas: 10
+Total da semana: 255
+Melhor dia: Sex (74 unidades)

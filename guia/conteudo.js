@@ -1,4 +1,4 @@
-// Conteúdo das etapas do 1º bimestre: TEORIA (separada) + PRÁTICA passo a passo.
+// Conteúdo das etapas (1º e 2º bimestres): TEORIA (separada) + PRÁTICA passo a passo.
 // Os códigos mostrados vêm de dados-gerados.js (gerado pelo build a partir dos arquivos reais do kit).
 window.montarGuia = function () {
   const { py, compara, caixa, dica, cmd, vscode, terminal, linhaDe, esc } = window.T;
@@ -11,7 +11,8 @@ window.montarGuia = function () {
     const lista = [];
     for (let i = 1; i < partes.length; i += 3) {
       const corpo = partes[i + 2].replace(/^\n/, "").split("\n");
-      const ent = corpo[0].replace("Valores digitados: ", "").split(" / ").map((x) => (x === "(só Enter)" ? "" : x));
+      const comando = corpo[0].startsWith("Comando:");
+      const ent = comando ? [] : corpo[0].replace("Valores digitados: ", "").split(" / ").map((x) => (x === "(só Enter)" ? "" : x));
       const linhas = corpo.slice(2).filter((l, j, arr) => !(j === arr.length - 1 && l === ""));
       while (linhas.length && linhas[linhas.length - 1] === "") linhas.pop();
       lista.push({ num: Number(partes[i]), nome: partes[i + 1], entradas: ent, linhas });
@@ -31,7 +32,7 @@ window.montarGuia = function () {
   }
   const arquivoDe = (n) => K[n].arquivo;
   const tituloKit = (n) => K[n].saida.split("\n")[0].replace(/^SAÍDA ESPERADA - ETAPA \d+: /, "");
-  const pasta = (n) => "etapa-0" + n;
+  const pasta = (n) => window.T.pastaDe(n);
 
   // ---------- fluxogramas (SVG) ----------
   function fluxo(passos, largura = 740) {
@@ -104,8 +105,8 @@ window.montarGuia = function () {
       ${caixa("info", "Dica de ouro", "<p>Criou o hábito de salvar a cada mudança? Metade dos problemas some. Se o verificador disser que ainda tem lacuna que você já preencheu, quase sempre é porque o arquivo não foi salvo.</p>")}`,
     };
   }
-  function passoRodar(n, extra = "") {
-    const t = testesDe(n)[0];
+  function passoRodar(n, extra = "", qual = 0) {
+    const t = testesDe(n)[qual];
     const c = `python ${pasta(n)}/${arquivoDe(n)}`;
     const digitar = t.entradas.map((e) => (e === "" ? "<b>(só aperte Enter)</b>" : `<code>${esc(e)}</code>`)).join(", depois ");
     return {
@@ -807,6 +808,569 @@ ___:
       passoVerificar(7),
     ],
     fim: `${caixa("ok", "🎉 Você construiu o Caixa v1 da Papelaria Ponto Certo!", "<p>Abra o seu <code>etapa-07/papelaria.py</code> e role do começo ao fim: cada parte foi uma semana de aula. Guarde o comprovante desta etapa, porque ele mostra o programa inteiro.</p>")}`,
+  };
+
+  // =====================================================================
+  // 2º BIMESTRE · O CAIXA QUE REPETE (Caixa v2)
+  // =====================================================================
+  const svgWhile = `<svg viewBox="0 0 640 330" role="img" style="max-width:640px;width:100%;display:block;margin:10px auto;background:#fff;border:1px solid #e3ded3;border-radius:10px">
+    <defs><marker id="pw" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b6271"/></marker></defs>
+    <g font-family="Segoe UI, sans-serif" font-size="13" fill="#1f2430" text-anchor="middle">
+      <polygon points="214,14 470,14 456,56 200,56" fill="#fff1e8" stroke="#c2410c" stroke-width="2"/><text x="335" y="40">Perguntar o 1º item (nome)</text>
+      <line x1="335" y1="56" x2="335" y2="82" stroke="#5b6271" stroke-width="2" marker-end="url(#pw)"/>
+      <polygon points="335,84 455,124 335,164 215,124" fill="#f1efff" stroke="#6d5bd0" stroke-width="2"/><text x="335" y="129" font-weight="700">nome != "" ?</text>
+      <line x1="335" y1="164" x2="335" y2="190" stroke="#5b6271" stroke-width="2" marker-end="url(#pw)"/><text x="350" y="182" font-weight="700" fill="#15803d" text-anchor="start">Sim</text>
+      <rect x="215" y="192" width="240" height="74" rx="4" fill="#fff" stroke="#5b6271" stroke-width="2"/>
+      <text x="335" y="212">perguntar o preço</text><text x="335" y="230">contador + 1 · acumulador + preço</text><text x="335" y="248" font-weight="700">perguntar o PRÓXIMO item</text>
+      <polyline points="215,229 120,229 120,124 213,124" fill="none" stroke="#5b6271" stroke-width="2" marker-end="url(#pw)"/><text x="120" y="216" fill="#5b6271">volta</text>
+      <polyline points="455,124 560,124 560,300 337,300" fill="none" stroke="#5b6271" stroke-width="2" marker-end="url(#pw)"/><text x="575" y="116" font-weight="700" fill="#b91c1c">Não</text>
+      <rect x="235" y="284" width="100" height="32" rx="16" fill="#e6f4f2" stroke="#0f766e" stroke-width="2"/><text x="285" y="305" font-weight="700">Resumo</text>
+    </g></svg>`;
+
+  // ---------------------------------------------------------------- ETAPA 8
+  E[8] = {
+    n: 8, semana: "Semana 08", tema: "Estruturas de repetição: o laço while (enquanto)",
+    titulo: "Vários itens (while com sentinela)",
+    resumo: "Nasce o Caixa v2: a compra agora tem quantos itens o cliente quiser, até apertar Enter.",
+    objetivos: ["Usar o while para repetir enquanto uma condição for verdadeira.", "Criar um contador e um acumulador.", "Encerrar a entrada de dados com uma sentinela e evitar o laço infinito."],
+    teoria: `
+<h2>1. Por que repetir?</h2>
+<p>O Caixa v1 vendia <b>um</b> produto por compra. Na vida real o cliente chega com cadernos, canetas, uma mochila... e o caixa não sabe quantos itens são. Precisamos de uma <b>estrutura de repetição</b>: um bloco de código que roda várias vezes. Cada volta se chama <b>iteração</b>.</p>
+${caixa("info", "Começa o Caixa v2", "<p>A partir desta etapa o programa é um caixa novo, o <b>Caixa v2</b>. Ele reaproveita a regra do frete do 1º bimestre e, a cada semana, ganha uma parte nova, até a Etapa 14.</p>")}
+
+<h2>2. O laço while (enquanto)</h2>
+<p>O <code>while</code> testa a condição <b>antes</b> de cada volta: se for verdadeira, executa o bloco e testa de novo; se for falsa, sai do laço e segue o programa. Se a condição já começar falsa, o bloco roda <b>zero</b> vezes.</p>
+${compara(`enquanto nome <> "" faca
+   escreva("Preço: ")
+   leia(preco)
+   ...
+fimenquanto`, `while nome != "":
+    preco = float(input("Preço (R$): "))
+    ...`)}
+<p>Como no <code>if</code>: a linha do <code>while</code> termina com <b>dois-pontos</b>, e o bloco que se repete fica <b>recuado</b> 4 espaços.</p>
+${svgWhile}
+
+<h2>3. Contador e acumulador</h2>
+<table class="tab"><tr><th></th><th>O que faz</th><th>No caixa</th></tr>
+<tr><td><b>Contador</b></td><td>Soma um valor <b>fixo</b> (normalmente 1) a cada volta.</td><td><code>quantidade_itens = quantidade_itens + 1</code></td></tr>
+<tr><td><b>Acumulador</b></td><td>Soma um valor que <b>muda</b> a cada volta.</td><td><code>subtotal = subtotal + preco</code></td></tr></table>
+<p>Os dois <b>começam em 0 antes do laço</b>. Veja o rastreamento (trace) de uma compra com 3 itens:</p>
+<table class="tab"><tr><th>Volta</th><th>nome</th><th>preco</th><th>quantidade_itens</th><th>subtotal</th></tr>
+<tr><td>antes</td><td>Caderno</td><td>-</td><td>0</td><td>0</td></tr>
+<tr><td>1ª</td><td>Caderno</td><td>25</td><td>1</td><td>25</td></tr>
+<tr><td>2ª</td><td>Caneta</td><td>2.50</td><td>2</td><td>27.50</td></tr>
+<tr><td>3ª</td><td>Mochila</td><td>150</td><td>3</td><td>177.50</td></tr>
+<tr><td>sai</td><td>"" (Enter)</td><td>-</td><td>3</td><td>177.50</td></tr></table>
+${caixa("info", "Atalho que você vai ver por aí", "<p><code>x = x + 1</code> também pode ser escrito <code>x += 1</code>. Neste projeto usamos a forma longa, que deixa claro o que acontece.</p>")}
+
+<h2>4. A sentinela: como o laço sabe que acabou</h2>
+<p>A <b>sentinela</b> é um valor especial que encerra a entrada de dados. No nosso caixa, é apertar <b>só Enter</b> no nome do item (texto vazio <code>""</code>). O padrão tem duas perguntas iguais:</p>
+<ol><li>Pergunta o <b>primeiro</b> item <b>antes</b> do <code>while</code>.</li><li>Pergunta o <b>próximo</b> item <b>no fim</b> do bloco do <code>while</code>.</li></ol>
+
+<h2>5. O laço infinito</h2>
+<p>Se a variável da condição <b>nunca muda</b> dentro do laço, a condição nunca fica falsa e o programa não para. Sem a pergunta do próximo item, o <code>nome</code> continua sempre "Caderno". É o bug mais comum com <code>while</code>.</p>
+${caixa("atencao", "Travou?", "<p>Clique no terminal e aperte <kbd>Ctrl</kbd> + <kbd>C</kbd> para interromper o programa. Depois procure qual variável da condição não está mudando.</p>")}
+
+<h2>6. Cuidado com a divisão por zero</h2>
+<p>O preço médio é <code>subtotal / quantidade_itens</code>. Se o cliente apertar Enter logo de cara, <code>quantidade_itens</code> é 0, e dividir por zero dá erro (<code>ZeroDivisionError</code>). Por isso a média só é calculada <b>se houver pelo menos um item</b>.</p>`,
+    quiz: [
+      { p: "No código, qual variável é o ACUMULADOR?", ops: ["quantidade_itens", "subtotal", "nome", "frete"], certa: 1, expl: "subtotal soma o preço (um valor que muda) a cada volta. quantidade_itens soma sempre 1: é o contador." },
+      { p: "Por que o programa ficaria preso para sempre sem a última linha do while?", ops: ["Porque o preço nunca muda", "Porque o nome nunca muda, e a condição nome != \"\" nunca fica falsa", "Porque falta o dois-pontos", "Porque o subtotal fica grande demais"], certa: 1, expl: "A condição depende do nome. Se o próximo nome não é perguntado, ele continua igual e o laço não acaba." },
+      { p: "O cliente apertou Enter logo no primeiro item. Quantas vezes o bloco do while roda?", ops: ["0", "1", "2", "Infinitas"], certa: 0, expl: "O while testa antes. Com o nome vazio a condição já começa falsa, e o bloco não roda nenhuma vez." },
+    ],
+    pratica: [
+      passoAbrir(8),
+      {
+        titulo: "Conheça o Caixa v2",
+        html: `<p>O arquivo é novo e mais curto que o Caixa v1. Role e identifique as 3 partes: <b>ETAPA 8</b> (o laço), o <b>frete</b> (regra do 1º bimestre, já pronta) e o <b>RESUMO</b>. São <b>5 lacunas</b>.</p>
+        ${vscode({ etapa: 8, aberto: true, linhas: ["ETAPA 8:", linhaDe(8, "PARTE B") + 1], realce: "lacunas" })}`,
+      },
+      {
+        titulo: `Lacuna 1 (linha ${linhaDe(8, 'while nome ___')}): a condição do while`,
+        html: `${py(`while nome ___ "":`)}
+        <p>O laço deve continuar <b>enquanto o nome NÃO for vazio</b>. Qual comparador do Python significa “diferente”?</p>
+        ${dica("Dica", "<p>Volte na tabela de comparadores da Etapa 2. O “diferente” do pseudocódigo é <code>&lt;&gt;</code>; no Python tem 2 caracteres e começa com ponto de exclamação.</p>")}`,
+      },
+      {
+        titulo: "Lacunas 2 e 3: o contador e o acumulador",
+        html: `${py(`    quantidade_itens = quantidade_itens + ___
+    subtotal = subtotal + ___`)}
+        ${caixa("pense", "Pense", "<p>A cada volta entra <b>um</b> item a mais: quanto o contador soma? E o subtotal deve somar o quê, a cada item? (É uma variável que acabou de ser perguntada na linha de cima.)</p>")}`,
+      },
+      {
+        titulo: `Lacuna 4 (linha ${linhaDe(8, "PARTE B") + 1}): PARTE B, a linha que impede o laço infinito`,
+        html: `<p>A linha toda é a lacuna. Nela vai a pergunta do <b>próximo item</b>, igualzinha à que aparece <b>antes</b> do <code>while</code>:</p>
+        ${py(`nome = input("Item (ou Enter para fechar a compra): ").strip()`, true)}
+        <ol class="faca"><li>Apague o <code>___</code>, mas <b>mantenha os 4 espaços</b> do começo (a linha precisa estar dentro do while).</li><li>Escreva (ou copie e cole) a linha acima.</li></ol>
+        ${caixa("atencao", "Sem esta linha...", "<p>...o <code>nome</code> nunca muda e o programa pede o preço para sempre. O verificador percebe isso e avisa.</p>")}`,
+      },
+      {
+        titulo: `Lacuna 5 (linha ${linhaDe(8, "if quantidade_itens ___")}): proteger a média`,
+        html: `${py(`if quantidade_itens ___ 0:  # protege contra divisão por zero`)}
+        <p>A média só pode ser calculada se houver <b>pelo menos 1 item</b>. Que comparador deixa passar 1, 2, 3... mas barra o 0?</p>`,
+      },
+      passoSalvar(),
+      passoRodar(8, caixa("pense", "Teste a sentinela e a compra vazia", "<p>Rode de novo e aperte <b>Enter</b> logo no primeiro item. Devem aparecer <b>Itens: 0</b>, sem a linha do preço médio e sem erro. Depois teste 4 agendas de 50 (frete grátis).</p>")),
+      passoVerificar(8),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 9
+  E[9] = {
+    n: 9, semana: "Semana 09", tema: "Estruturas de repetição: o laço for e a função range()",
+    titulo: "Parcelamento (for com range)",
+    resumo: "O caixa sublinha o nome do cliente e mostra as parcelas uma por uma.",
+    objetivos: ["Percorrer um texto com for.", "Gerar sequências de números com range(início, fim).", "Escolher entre for e while."],
+    teoria: `
+<h2>1. O laço for: um para cada</h2>
+<p>O <code>for</code> repete o bloco <b>uma vez para cada item</b> de uma coleção. A cada volta, a <b>variável de controle</b> recebe o item da vez. Um <b>texto</b> também é uma coleção: de letras (e espaços).</p>
+${compara(`para i de 1 ate 3 faca
+   escreva("Parcela ", i)
+fimpara`, `for numero in range(1, 4):
+    print("Parcela", numero)`)}
+${py(`for letra in "Ana":
+    print(letra)
+# mostra A, depois n, depois a (uma por linha)`)}
+
+<h2>2. A função range()</h2>
+<p><code>range</code> gera uma sequência de números inteiros. Ela <b>para ANTES do fim</b>:</p>
+<table class="tab"><tr><th>Código</th><th>Gera</th></tr>
+<tr><td><code>range(5)</code></td><td>0, 1, 2, 3, 4</td></tr>
+<tr><td><code>range(1, 5)</code></td><td>1, 2, 3, 4</td></tr>
+<tr><td><code>range(1, 5 + 1)</code></td><td>1, 2, 3, 4, 5</td></tr>
+<tr><td><code>range(0, 11, 2)</code></td><td>0, 2, 4, 6, 8, 10 (de 2 em 2: o 3º número é o <b>passo</b>)</td></tr></table>
+${caixa("atencao", "O erro “off-by-one” (um a mais ou a menos)", "<p>Para mostrar as parcelas de <b>1 até parcelas</b>, o fim do range precisa ser <code>parcelas + 1</code>. Com <code>range(1, parcelas)</code> falta a última parcela. Com <code>range(0, parcelas)</code> aparece uma “Parcela 0”.</p>")}
+
+<h2>3. Acumulador de texto</h2>
+<p>Dá para acumular texto do mesmo jeito que números: <code>+</code> junta (concatena) textos. Para sublinhar o nome do cliente, juntamos um <code>"="</code> para cada letra:</p>
+${py(`sublinhado = ""
+for letra in "Ana":
+    sublinhado = sublinhado + "="
+print(sublinhado)   # ===`)}
+
+<h2>4. for ou while?</h2>
+<table class="tab"><tr><th>Use</th><th>Quando</th><th>No caixa</th></tr>
+<tr><td><code>for</code></td><td>Você sabe quantas voltas (ou tem uma coleção para percorrer).</td><td>As parcelas: são exatamente <code>parcelas</code> voltas.</td></tr>
+<tr><td><code>while</code></td><td>Não sabe quantas voltas: depende de uma condição.</td><td>Os itens: até o cliente apertar Enter.</td></tr></table>
+<p>As parcelas também usam uma decisão do 1º bimestre: <code>if parcelas &lt; 1 or parcelas &gt; 6</code> corrige um número inválido para 1.</p>`,
+    quiz: [
+      { p: "Quais números range(1, 4) gera?", ops: ["1, 2, 3, 4", "1, 2, 3", "0, 1, 2, 3", "4"], certa: 1, expl: "O range para ANTES do fim: começa no 1 e vai até 3." },
+      { p: "Quantas voltas tem: for letra in \"Ana Lu\"?", ops: ["2", "5", "6", "7"], certa: 2, expl: "São 6 caracteres: A, n, a, espaço, L, u. O espaço também conta." },
+      { p: "Para repetir até o cliente digitar \"sair\", qual laço é mais adequado?", ops: ["for com range", "while", "Tanto faz"], certa: 1, expl: "Não dá para saber quantas voltas serão: depende do que for digitado. Esse é o caso do while." },
+    ],
+    pratica: [
+      passoAbrir(9),
+      {
+        titulo: "O que mudou no arquivo",
+        html: `<p>A Etapa 8 já vem resolvida. Há duas novidades: o programa pergunta o <b>nome do cliente</b> logo no começo, e no fim pergunta em <b>quantas parcelas</b>. São <b>3 lacunas</b> em 2 linhas.</p>
+        ${vscode({ etapa: 9, aberto: true, linhas: ["ETAPA 9: o nome", linhaDe(9, "print(sublinhado)")], realce: "lacunas" })}`,
+      },
+      {
+        titulo: `Lacuna 1 (linha ${linhaDe(9, "for letra in ___")}): percorrer o nome do cliente`,
+        html: `${py(`for letra in ___:
+    sublinhado = sublinhado + "="`)}
+        <p>O sublinhado deve ter um <code>=</code> para <b>cada letra do nome do cliente</b>. Qual variável guarda esse nome? Escreva o nome da variável, <b>sem aspas</b>.</p>
+        ${caixa("atencao", "Com aspas é outra coisa", "<p><code>for letra in \"cliente\"</code> percorreria a palavra <i>cliente</i> (7 letras), e não o nome digitado.</p>")}`,
+      },
+      {
+        titulo: `Lacunas 2 e 3 (linha ${linhaDe(9, "range(___, ___)")}): o range das parcelas`,
+        html: `${vscode({ etapa: 9, aberto: true, linhas: ["ETAPA 9: PARCELAMENTO", linhaDe(9, "range(___, ___)") + 1], realce: "lacunas" })}
+        ${py(`for numero in range(___, ___):`)}
+        ${caixa("pense", "Pense", "<p>Com 3 parcelas, queremos ver Parcela 1, Parcela 2 e Parcela 3. Onde o range deve <b>começar</b>? E, lembrando que ele para <b>antes</b> do fim, qual deve ser o <b>fim</b> para incluir a última parcela?</p>")}
+        ${dica("Dica", "<p>O fim é uma conta pequena com a variável <code>parcelas</code>. Releia a tabela do range na Teoria.</p>")}`,
+      },
+      passoSalvar(),
+      passoRodar(9, caixa("pense", "Teste o inválido", "<p>Rode de novo e peça <code>7</code> parcelas. Deve aparecer <b>Número de parcelas inválido</b> e uma única parcela. Teste também um nome com sobrenome: o espaço também ganha um <code>=</code>.</p>")),
+      passoVerificar(9),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 10
+  E[10] = {
+    n: 10, semana: "Semana 10", tema: "Repetição aninhada, eficiência e listas",
+    titulo: "Nota, contagem e busca (listas)",
+    resumo: "Os itens ficam guardados em listas: o caixa imprime a nota, conta os itens caros e busca o primeiro de alto valor.",
+    objetivos: ["Guardar valores numa lista com append e acessá-los pelo índice.", "Percorrer duas listas paralelas com range(len(...)).", "Contar com if dentro do for e parar uma busca com break."],
+    teoria: `
+<h2>1. Listas: vários valores com um nome só</h2>
+<p>Até aqui o preço de cada item era esquecido na volta seguinte. Uma <b>lista</b> guarda todos, em ordem:</p>
+${py(`precos = []            # lista vazia
+precos.append(25)      # [25]
+precos.append(2.5)     # [25, 2.5]
+print(precos[0])       # 25   -> a PRIMEIRA posição é 0
+print(len(precos))     # 2    -> quantos itens a lista tem`)}
+<table class="tab"><tr><th>Comando</th><th>O que faz</th></tr>
+<tr><td><code>lista.append(x)</code></td><td>Acrescenta <code>x</code> no fim da lista.</td></tr>
+<tr><td><code>lista[i]</code></td><td>O item da posição <code>i</code> (começa em 0).</td></tr>
+<tr><td><code>len(lista)</code></td><td>Quantidade de itens. A última posição é <code>len(lista) - 1</code>.</td></tr></table>
+
+<h2>2. Listas paralelas</h2>
+<p>O caixa usa <b>duas</b> listas: <code>produtos</code> (nomes) e <code>precos</code>. O item da posição <code>i</code> de uma corresponde ao da mesma posição na outra: <code>produtos[1]</code> custa <code>precos[1]</code>. Para percorrer as duas juntas, o <code>for</code> passa pelos <b>índices</b>:</p>
+${py(`for i in range(len(produtos)):
+    print(f"{i + 1}. {produtos[i]}: R$ {precos[i]:.2f}")`)}
+<p>Na nota, aparece <code>i + 1</code> porque as pessoas contam a partir de 1, e o Python a partir de 0.</p>
+
+<h2>3. Contar: if dentro do for</h2>
+${compara(`caros <- 0
+para cada p em precos faca
+   se p >= 50 entao
+      caros <- caros + 1
+   fimse
+fimpara`, `caros = 0
+for p in precos:
+    if p >= 50:
+        caros = caros + 1`)}
+
+<h2>4. Buscar e parar: break</h2>
+<p>Para achar o <b>primeiro</b> item acima de R$ 100,00, não precisamos olhar o resto da lista depois de encontrá-lo. O <code>break</code> <b>interrompe o laço na hora</b> (no Visualg, <code>interrompa</code>). Sem ele, a busca continuaria e acabaria guardando o <b>último</b> item caro, e não o primeiro.</p>
+${caixa("info", "Eficiência", "<p>Numa lista com 1.000 itens, se o procurado está na posição 3, o <code>break</code> evita 997 comparações inúteis. Quanto mais cedo o laço para, menos trabalho o computador faz.</p>")}
+
+<h2>5. Laço dentro de laço (aninhado)</h2>
+<p>Um <code>for</code> pode ficar dentro de outro: para cada volta do de fora, o de dentro roda <b>inteiro</b>. Com 3 voltas fora e 4 dentro, o bloco interno roda 3 × 4 = 12 vezes. Você vai usar isso na próxima etapa, para ordenar a lista.</p>`,
+    quiz: [
+      { p: "Depois de precos = [25, 2.5, 150], quanto vale precos[1]?", ops: ["25", "2.5", "150", "Dá erro"], certa: 1, expl: "A primeira posição é 0. Então precos[0] é 25 e precos[1] é 2.5." },
+      { p: "Sem o break, a busca do item acima de R$ 100,00 guardaria:", ops: ["O primeiro item caro", "O último item caro", "Nenhum item"], certa: 1, expl: "Sem parar, o laço continua e cada item caro encontrado substitui o anterior. Fica o último." },
+      { p: "Um for de 3 voltas com outro for de 5 voltas dentro. Quantas vezes o bloco de dentro roda?", ops: ["8", "15", "5", "3"], certa: 1, expl: "Para cada uma das 3 voltas de fora, o de dentro roda 5 vezes: 3 × 5 = 15." },
+    ],
+    pratica: [
+      passoAbrir(10),
+      {
+        titulo: "Lacunas 1 e 2: guardar cada item nas listas",
+        html: `${vscode({ etapa: 10, aberto: true, linhas: [linhaDe(10, "produtos = []"), linhaDe(10, "PRÓXIMO item") + 1], realce: "lacunas" })}
+        <p>As listas <code>produtos</code> e <code>precos</code> são criadas vazias antes do laço. Dentro do <code>while</code>, cada item precisa ser guardado:</p>
+        ${py(`    produtos.___(nome)
+    precos.append(___)`)}
+        ${dica("Dica", "<p>O comando que acrescenta no fim da lista está na tabela da Teoria. Na segunda linha, qual variável guarda o preço que acabou de ser digitado?</p>")}`,
+      },
+      {
+        titulo: `Lacuna 3 (linha ${linhaDe(10, "range(___(produtos))")}): o range da nota`,
+        html: `${py(`for i in range(___(produtos)):`)}
+        <p>O <code>for</code> precisa passar por todos os índices: 0, 1, 2... até o último. Que função diz <b>quantos itens</b> a lista tem?</p>`,
+      },
+      {
+        titulo: "Lacunas 4 e 5: contar e parar a busca",
+        html: `${vscode({ etapa: 10, aberto: true, linhas: ["ETAPA 10: CONTAGEM", linhaDe(10, 'print("Conferir com o gerente:"')], realce: "lacunas" })}
+        ${py(`        caros = ___`)}
+        <p>Quando o preço é 50 ou mais, o contador <code>caros</code> ganha <b>mais 1</b>. Escreva a conta completa (como o contador da Etapa 8).</p>
+        ${py(`        ___  # achou o primeiro: para a busca`)}
+        <p>Quando acha o primeiro item acima de R$ 100,00, o laço deve <b>parar</b>. Qual palavra do Python faz isso? Mantenha o recuo.</p>`,
+      },
+      passoSalvar(),
+      passoRodar(10, caixa("pense", "Teste o break", "<p>Rode com <code>Mochila 150</code>, <code>Calculadora 120</code> e <code>Caderno 25</code>. Deve aparecer <b>Conferir com o gerente: Mochila</b> (o primeiro). Se aparecer Calculadora, o break não está funcionando.</p>")),
+      passoVerificar(10),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 11
+  E[11] = {
+    n: 11, semana: "Semana 11", tema: "Vetores: acesso, busca, ordenação e estatísticas",
+    titulo: "Estatísticas e ordenação (vetores)",
+    resumo: "O caixa descobre o item mais caro e o mais barato e ordena a compra com o Bubble Sort.",
+    objetivos: ["Achar o maior e o menor valor de um vetor sem funções prontas.", "Ordenar com o Bubble Sort, trocando vizinhos com uma variável auxiliar.", "Manter listas paralelas certas durante a ordenação."],
+    teoria: `
+<h2>1. Vetor, lista: o mesmo papel</h2>
+<p>Na apostila, <b>vetor</b> é um conjunto de valores do mesmo tipo com um nome só e posições numeradas. Em Python, a <b>lista</b> faz esse papel. No Visualg, a primeira posição é 1; no Python, é <b>0</b>.</p>
+
+<h2>2. Maior e menor: olhar um por um</h2>
+<p>A ideia: “o maior até agora é o primeiro”. Depois, olhando os outros, sempre que aparecer um valor <b>maior</b> que ele, esse passa a ser o maior.</p>
+${compara(`maior <- precos[1]
+para i de 1 ate n faca
+   se precos[i] > maior entao
+      maior <- precos[i]
+   fimse
+fimpara`, `maior = precos[0]
+for p in precos:
+    if p > maior:
+        maior = p`)}
+${caixa("atencao", "Por que não começar com zero?", "<p>Para o maior até funcionaria com preços, mas para o <b>menor</b> não: nenhum preço é menor que 0, e o resultado ficaria errado. Começar com o primeiro item funciona sempre.</p>")}
+<p>O Python tem <code>max()</code> e <code>min()</code> prontos, mas nesta etapa o objetivo é entender o <b>algoritmo</b>: por isso o verificador não aceita as funções prontas.</p>
+
+<h2>3. Bubble Sort (ordenação por bolha)</h2>
+<p>Compara cada par de <b>vizinhos</b>; se estiverem fora de ordem, <b>troca</b>. A cada passada, o maior valor “borbulha” até o fim. Com <code>n</code> itens, bastam <code>n - 1</code> passadas.</p>
+<table class="tab"><tr><th>Passada</th><th>Comparação</th><th>Lista</th></tr>
+<tr><td>início</td><td></td><td>[25, 2.5, 150]</td></tr>
+<tr><td>1</td><td>25 &gt; 2.5? sim, troca</td><td>[2.5, 25, 150]</td></tr>
+<tr><td>1</td><td>25 &gt; 150? não</td><td>[2.5, 25, 150]</td></tr>
+<tr><td>2</td><td>2.5 &gt; 25? não</td><td>[2.5, 25, 150] ✓ ordenada</td></tr></table>
+
+<h2>4. A troca precisa de uma variável auxiliar</h2>
+<p>Para trocar dois copos de suco você precisa de um terceiro copo vazio. Com variáveis é igual:</p>
+${py(`aux = precos[j]
+precos[j] = precos[j + 1]
+precos[j + 1] = aux`)}
+${caixa("atencao", "Listas paralelas: troque as duas!", "<p>Se trocar só os preços, os nomes ficam no lugar antigo e a nota diz que o caderno custa R$ 2,50. Toda troca em <code>precos</code> precisa da mesma troca em <code>produtos</code>.</p>")}`,
+    quiz: [
+      { p: "Para achar o MENOR preço, quando a variável menor deve ser trocada?", ops: ["Quando p > menor", "Quando p < menor", "Sempre", "Nunca"], certa: 1, expl: "O menor só muda quando aparece um valor ainda menor que ele." },
+      { p: "Na lista [40, 20], o Bubble Sort compara 40 > 20. O que acontece?", ops: ["Nada", "Troca: fica [20, 40]", "Remove o 40", "Para a ordenação"], certa: 1, expl: "Os vizinhos estão fora de ordem (o maior vem antes), então são trocados." },
+      { p: "Para que serve a variável aux na troca?", ops: ["Contar as trocas", "Guardar um valor para ele não se perder", "Somar os preços", "Parar o laço"], certa: 1, expl: "Sem ela, ao copiar um valor por cima do outro, o primeiro se perde. A aux guarda uma cópia durante a troca." },
+    ],
+    pratica: [
+      passoAbrir(11),
+      {
+        titulo: "Encontre a parte ETAPA 11",
+        html: `${vscode({ etapa: 11, aberto: true, linhas: ["ETAPA 11:", linhaDe(11, "produtos[j + 1] = aux")], realce: "lacunas" })}
+        <p>Tudo fica dentro de <code>if len(precos) &gt; 0:</code>: numa compra vazia não existe maior nem menor. São <b>4 lacunas</b>.</p>`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: maior e menor",
+        html: `${py(`        if p ___ maior:
+            maior = p
+        if p < menor:
+            menor = ___`)}
+        ${caixa("pense", "Pense", "<p>A primeira lacuna é um comparador: quando <code>p</code> deve virar o novo maior? Na segunda, o <code>if</code> já está pronto: <b>quem</b> passa a ser o menor?</p>")}`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: o Bubble Sort",
+        html: `${py(`            if precos[j] ___ precos[j + 1]:
+                aux = precos[j]
+                precos[j] = precos[j + 1]
+                precos[j + 1] = aux
+                aux = produtos[j]
+                produtos[j] = ___
+                produtos[j + 1] = aux`)}
+        <ul><li><b>Lacuna 3:</b> queremos do mais barato ao mais caro. Os vizinhos estão fora de ordem quando o da esquerda é ___ que o da direita?</li>
+        <li><b>Lacuna 4:</b> a troca dos nomes é igual à dos preços, 3 linhas acima. Compare as duas e complete.</li></ul>
+        ${dica("Dica", "<p>Desenhe numa folha a lista [25, 2.5, 150] e faça as trocas à mão, como na tabela da Teoria.</p>")}`,
+      },
+      passoSalvar(),
+      passoRodar(11),
+      passoVerificar(11),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 12
+  E[12] = {
+    n: 12, semana: "Semana 12", tema: "Matrizes (arrays bidimensionais)",
+    titulo: "Relatório da semana (matriz)",
+    resumo: "No fim da venda, o caixa pode mostrar o relatório da semana, calculado de uma matriz.",
+    objetivos: ["Representar uma tabela como matriz (lista de listas).", "Acessar uma célula com [linha][coluna].", "Somar por linha e por coluna com laços aninhados, reiniciando o acumulador."],
+    teoria: `
+<h2>1. Matriz: uma tabela com linhas e colunas</h2>
+<p>A papelaria anotou quantas unidades vendeu de cada categoria em cada dia da semana:</p>
+<table class="tab"><tr><th>vendas</th><th>Seg (0)</th><th>Ter (1)</th><th>Qua (2)</th><th>Qui (3)</th><th>Sex (4)</th></tr>
+<tr><th>Cadernos (0)</th><td>12</td><td>8</td><td>15</td><td>10</td><td>20</td></tr>
+<tr><th>Canetas (1)</th><td>30</td><td>25</td><td>40</td><td>35</td><td>50</td></tr>
+<tr><th>Mochilas (2)</th><td>2</td><td>1</td><td>3</td><td>0</td><td>4</td></tr></table>
+<p>É uma <b>matriz 3 × 5</b> (3 linhas, 5 colunas). Em Python, é uma <b>lista de listas</b>: cada linha é uma lista.</p>
+${py(`vendas = [
+    [12, 8, 15, 10, 20],   # linha 0: Cadernos
+    [30, 25, 40, 35, 50],  # linha 1: Canetas
+    [2, 1, 3, 0, 4],       # linha 2: Mochilas
+]
+print(vendas[1][4])   # 50 -> linha 1 (Canetas), coluna 4 (Sex)`)}
+${caixa("info", "Primeiro a linha, depois a coluna", "<p><code>vendas[i][j]</code>: <code>i</code> é a linha e <code>j</code> é a coluna. Trocar a ordem dá outro valor, ou erro (<code>IndexError</code>), porque só existem 3 linhas.</p>")}
+
+<h2>2. Percorrer a matriz: um for dentro do outro</h2>
+${compara(`para i de 1 ate 3 faca
+   total_linha <- 0
+   para j de 1 ate 5 faca
+      total_linha <- total_linha + vendas[i, j]
+   fimpara
+   escreva(categorias[i], total_linha)
+fimpara`, `for i in range(len(categorias)):
+    total_linha = 0
+    for j in range(len(dias)):
+        total_linha = total_linha + vendas[i][j]
+    print(categorias[i], total_linha)`)}
+<p>O <code>for</code> de fora escolhe a <b>linha</b>; o de dentro passa por todas as <b>colunas</b> dela.</p>
+${caixa("atencao", "Reinicie o acumulador!", "<p><code>total_linha = 0</code> fica <b>dentro</b> do for de fora: cada categoria começa a soma do zero. Se ficar fora, as Canetas somam também os Cadernos (180 + 65 = 245).</p>")}
+
+<h2>3. Somar uma coluna (o melhor dia)</h2>
+<p>Para o total de cada <b>dia</b>, invertemos os laços: o de fora percorre as colunas (<code>j</code>) e o de dentro as linhas (<code>i</code>). Sexta: 20 + 50 + 4 = <b>74</b> unidades, o melhor dia.</p>`,
+    quiz: [
+      { p: "Na matriz da Teoria, quanto vale vendas[2][0]?", ops: ["12", "2", "30", "0"], certa: 1, expl: "Linha 2 (Mochilas), coluna 0 (Seg): 2." },
+      { p: "Quantas células tem uma matriz 3 × 5?", ops: ["8", "15", "35", "53"], certa: 1, expl: "3 linhas × 5 colunas = 15 células." },
+      { p: "Onde deve ficar total_linha = 0 para somar cada linha separadamente?", ops: ["Antes dos dois for", "Dentro do for de fora, antes do de dentro", "Dentro do for de dentro", "Depois dos dois for"], certa: 1, expl: "Cada linha começa do zero, então a soma é zerada no começo de cada volta do for de fora." },
+    ],
+    pratica: [
+      passoAbrir(12),
+      {
+        titulo: "Encontre a parte ETAPA 12",
+        html: `${vscode({ etapa: 12, aberto: true, linhas: ["ETAPA 12:", linhaDe(12, 'print("Total da semana:"')], realce: "lacunas" })}
+        <p>O relatório só aparece se a pessoa responder <code>s</code>. A matriz <code>vendas</code> já está pronta. São <b>4 lacunas</b>, em 3 linhas, todas na soma por categoria.</p>`,
+      },
+      {
+        titulo: "Lacuna 1: reiniciar a soma de cada linha",
+        html: `${py(`        total_linha = ___`)}<p>Com quanto cada categoria começa a soma?</p>`,
+      },
+      {
+        titulo: "Lacuna 2: o for das colunas",
+        html: `${py(`        for j in range(len(___)):`)}<p>O <code>j</code> percorre as <b>colunas</b>. Cada coluna é um <b>dia</b>. Qual lista tem um item para cada coluna?</p>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: acessar a célula",
+        html: `${py(`            total_linha = total_linha + vendas[___][___]`)}
+        <p>Primeiro a <b>linha</b> (a categoria da vez, do for de fora), depois a <b>coluna</b> (o dia da vez, do for de dentro). Quais são as variáveis de controle desses dois laços?</p>`,
+      },
+      passoSalvar(),
+      passoRodar(12, caixa("pense", "Confira com a tabela", "<p>Os totais devem dar Cadernos 65, Canetas 180 e Mochilas 10 (total 255), e o melhor dia é Sex, com 74. Faça a soma da primeira linha à mão e compare.</p>")),
+      passoVerificar(12),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 13
+  E[13] = {
+    n: 13, semana: "Semana 13", tema: "Funções e procedimentos: modularização",
+    titulo: "Funções (modularização)",
+    resumo: "O mesmo caixa, agora dividido em funções com nome. Ele faz exatamente o que fazia na Etapa 12.",
+    objetivos: ["Criar funções com def, parâmetros e return.", "Diferenciar função (devolve valor) de procedimento (só executa).", "Usar o bloco if __name__ == \"__main__\"."],
+    teoria: `
+<h2>1. Por que modularizar?</h2>
+<p>O Caixa v2 passou de 140 linhas, numa sequência só. Fica difícil achar onde está cada regra. <b>Modularizar</b> é dividir o programa em <b>funções</b>: blocos com nome, cada um com uma tarefa. É como uma cozinha com estações: cada uma faz uma parte.</p>
+${caixa("info", "Refatorar não muda o resultado", "<p>Nesta etapa o caixa faz <b>exatamente</b> o que fazia na Etapa 12, com os mesmos testes e as mesmas telas. Melhorar a organização sem mudar o comportamento se chama <b>refatoração</b>.</p>")}
+
+<h2>2. Anatomia de uma função</h2>
+${compara(`Funcao calcular_frete(subtotal: real): real
+inicio
+   se (subtotal > 0) e (subtotal < 200) entao
+      retorne 15
+   fimse
+   retorne 0
+FimFuncao`, `def calcular_frete(subtotal):
+    if subtotal > 0 and subtotal < 200:
+        return 15
+    return 0`)}
+<table class="tab"><tr><th>Parte</th><th>No exemplo</th><th>O que é</th></tr>
+<tr><td><code>def</code></td><td><code>def</code></td><td>“Vou definir uma função.”</td></tr>
+<tr><td>Nome</td><td><code>calcular_frete</code></td><td>Em <b>snake_case</b>: minúsculas, palavras separadas por _.</td></tr>
+<tr><td>Parâmetro</td><td><code>subtotal</code></td><td>Nome que recebe o valor enviado na chamada.</td></tr>
+<tr><td><code>return</code></td><td><code>return 15</code></td><td>Devolve o resultado e <b>sai</b> da função na hora.</td></tr></table>
+<p>Na <b>chamada</b>, o valor enviado é o <b>argumento</b>: <code>frete = calcular_frete(subtotal)</code>.</p>
+
+<h2>3. Função ou procedimento?</h2>
+<table class="tab"><tr><th></th><th>Devolve valor?</th><th>No caixa</th></tr>
+<tr><td><b>Função</b></td><td>Sim, com <code>return</code>.</td><td><code>calcular_frete</code>, <code>maior_valor</code></td></tr>
+<tr><td><b>Procedimento</b></td><td>Não: só executa uma ação.</td><td><code>mostrar_relatorio</code>, <code>ordenar</code></td></tr></table>
+
+<h2>4. Escopo: cada função tem suas variáveis</h2>
+<p>Uma variável criada <b>dentro</b> de uma função só existe lá dentro (é <b>local</b>). O <code>maior</code> de <code>maior_valor</code> não conflita com nada fora dela. Por isso as funções recebem o que precisam por <b>parâmetros</b> e entregam o resultado por <b>return</b>.</p>
+
+<h2>5. DRY e o bloco __main__</h2>
+<p>A pergunta “Item (ou Enter...)” aparecia <b>duas vezes</b> no while. Agora existe a função <code>pedir_item()</code>, chamada nos dois lugares. Esse é o princípio <b>DRY</b> (<i>Don't Repeat Yourself</i>): cada regra em um lugar só.</p>
+${py(`if __name__ == "__main__":
+    main()`)}
+<p>Este bloco quer dizer: “só rode o caixa se <b>este arquivo</b> foi executado diretamente”. Na próxima etapa, outro arquivo vai importar funções daqui, e esse bloco evita que o caixa comece sozinho.</p>`,
+    quiz: [
+      { p: "Em frete = calcular_frete(subtotal), o subtotal é:", ops: ["O parâmetro", "O argumento", "O retorno", "O nome da função"], certa: 1, expl: "O valor enviado na chamada é o argumento. O parâmetro é o nome que aparece na linha do def." },
+      { p: "Qual nome segue a convenção snake_case?", ops: ["CalcularFrete", "calcularfrete", "calcular_frete", "Calcular-Frete"], certa: 2, expl: "snake_case usa letras minúsculas e palavras separadas por sublinhado." },
+      { p: "O que acontece com as linhas de uma função logo depois de um return?", ops: ["Rodam normalmente", "Não rodam: o return sai da função", "Rodam duas vezes", "Dão erro"], certa: 1, expl: "O return devolve o valor e encerra a função na hora." },
+    ],
+    pratica: [
+      passoAbrir(13),
+      {
+        titulo: "O mapa do arquivo: quem é quem",
+        html: `<p>Role o arquivo de cima a baixo. Ele tem 3 partes:</p>
+        <table class="tab"><tr><th>Parte</th><th>Funções</th></tr>
+        <tr><td><b>Funções de regra</b> (calculam e devolvem)</td><td><code>calcular_frete</code>, <code>sublinhado_de</code>, <code>contar_a_partir_de</code>, <code>primeiro_acima</code>, <code>maior_valor</code>, <code>menor_valor</code>, <code>ordenar</code>, <code>total_da_linha</code></td></tr>
+        <tr><td><b>Funções da tela</b> (perguntam e mostram)</td><td><code>pedir_item</code>, <code>mostrar_relatorio</code></td></tr>
+        <tr><td><b>Programa principal</b></td><td><code>main</code> e o bloco <code>if __name__ == "__main__":</code></td></tr></table>
+        <p>Compare com a Etapa 12: o código de cada função é o mesmo trecho que antes ficava solto. São <b>6 lacunas</b>.</p>`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: definir e devolver",
+        html: `${vscode({ etapa: 13, aberto: true, linhas: [linhaDe(13, "def calcular_frete") - 1, linhaDe(13, "def calcular_frete") + 4], realce: "lacunas" })}
+        ${py(`def calcular_frete(___):`)}
+        <p>Que valor a função precisa <b>receber</b> para decidir o frete? Olhe o corpo da função: qual variável ela usa nas comparações?</p>
+        ${py(`    return ___`)}
+        <p>(Linha ${linhaDe(13, "    return ___")}, no fim de <code>maior_valor</code>.) A função procurou o maior valor e o guardou numa variável. O que ela deve <b>devolver</b>?</p>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: chamar as funções no main",
+        html: `${vscode({ etapa: 13, aberto: true, linhas: [linhaDe(13, "def main():"), linhaDe(13, "frete = calcular_frete(___)")], realce: "lacunas" })}
+        ${py(`    nome = ___()`)}
+        <p>Qual função pergunta o próximo item? (Ela já é usada no fim do while: copie o mesmo nome.)</p>
+        ${py(`    frete = calcular_frete(___)`)}
+        <p>O frete depende do valor dos produtos. Qual variável do <code>main</code> guarda esse valor?</p>`,
+      },
+      {
+        titulo: "Lacunas 5 e 6: o bloco __main__",
+        html: `${py(`if __name__ == "___":
+    ___()`)}
+        <p>O nome especial tem 2 sublinhados de cada lado (veja a Teoria). Na linha de baixo, chame a função que roda o caixa inteiro.</p>
+        ${caixa("atencao", "Se nada aparecer na tela...", "<p>...o programa definiu as funções, mas ninguém chamou o <code>main()</code>. É o erro mais comum quando se começa a usar funções.</p>")}`,
+      },
+      passoSalvar(),
+      passoRodar(13, caixa("ok", "Mesma tela da Etapa 12", "<p>A saída deve ser idêntica à da Etapa 12. Essa é a prova de que a refatoração não mudou o comportamento do caixa.</p>")),
+      passoVerificar(13),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 14
+  E[14] = {
+    n: 14, semana: "Semana 14", tema: "Revisão integrada e modularização",
+    titulo: "Dois módulos e testes",
+    resumo: "As regras vão para um módulo próprio, o regras.py, com testes automáticos. Fim do Caixa v2!",
+    objetivos: ["Separar o programa em dois módulos: regras e tela.", "Importar funções com from ... import.", "Escrever testes com assert e fazer revisão de código em dupla."],
+    teoria: `
+<h2>1. Um módulo é um arquivo .py</h2>
+<p>Um <b>módulo</b> é um arquivo Python com funções que outros arquivos podem usar. Nesta etapa o caixa fica em <b>dois</b> arquivos, na mesma pasta:</p>
+<table class="tab"><tr><th>Arquivo</th><th>Papel</th><th>Tem</th></tr>
+<tr><td><code>regras.py</code></td><td><b>Lógica</b>: só calcula. Não pergunta nada nem mostra a venda.</td><td>As 8 funções de regra e os testes.</td></tr>
+<tr><td><code>papelaria.py</code></td><td><b>Tela</b>: conversa com o cliente.</td><td><code>pedir_item</code>, <code>mostrar_relatorio</code> e <code>main</code>.</td></tr></table>
+<p>Vantagem: dá para testar as regras sem digitar uma compra inteira, e mudar a tela sem mexer nas regras.</p>
+
+<h2>2. Importar</h2>
+${py(`from regras import calcular_frete, maior_valor
+frete = calcular_frete(150)   # usa a função que está no regras.py`)}
+<p>O nome depois de <code>from</code> é o nome do arquivo <b>sem</b> o <code>.py</code>. Os dois arquivos precisam estar na <b>mesma pasta</b>.</p>
+
+<h2>3. Testes automáticos com assert</h2>
+<p><code>assert</code> quer dizer “garanta que”. Se a condição for verdadeira, nada acontece; se for falsa, o Python para com <code>AssertionError</code>:</p>
+${py(`assert calcular_frete(50) == 15    # passa em silêncio
+assert calcular_frete(50) == 0     # AssertionError!`)}
+<p>Os testes ficam no fim do <code>regras.py</code>, dentro do <code>if __name__ == "__main__":</code>. Eles rodam quando você executa <code>python etapa-14/regras.py</code>, mas <b>não</b> quando o <code>papelaria.py</code> importa o módulo.</p>
+${caixa("info", "Teste os limites", "<p>Os bons testes ficam nas fronteiras das regras: frete com 0, com 199,99 e com exatamente 200. São os casos em que um <code>&lt;</code> trocado por <code>&lt;=</code> aparece.</p>")}
+
+<h2>4. Revisão de código (code review)</h2>
+<p>Em equipes de software, ninguém publica código sem que um colega leia. Use este roteiro com a sua dupla:</p>
+<table class="tab"><tr><th>Pergunta</th></tr>
+<tr><td>Os nomes das funções e variáveis dizem o que elas fazem?</td></tr>
+<tr><td>Alguma regra aparece repetida em dois lugares (fere o DRY)?</td></tr>
+<tr><td>Cada função faz uma coisa só?</td></tr>
+<tr><td>Os testes cobrem os valores de limite?</td></tr></table>
+<p>O feedback deve ser <b>assertivo</b>: aponte o trecho, explique o problema e sugira uma melhora, sempre sobre o código e não sobre a pessoa.</p>`,
+    quiz: [
+      { p: "Para usar maior_valor do arquivo regras.py, qual linha está certa?", ops: ["import regras.py", "from regras import maior_valor", "from regras.py import maior_valor", "include regras"], certa: 1, expl: "O nome do módulo vai sem o .py: from regras import maior_valor." },
+      { p: "O que acontece quando um assert é falso?", ops: ["Nada", "O Python para com AssertionError", "Ele vira verdadeiro", "O teste é pulado"], certa: 1, expl: "assert falso interrompe o programa com AssertionError, mostrando a linha do teste que falhou." },
+      { p: "Por que os testes do regras.py não rodam quando o papelaria.py importa o módulo?", ops: ["Porque estão comentados", "Porque estão dentro do if __name__ == \"__main__\"", "Porque o import ignora asserts", "Porque estão em outra pasta"], certa: 1, expl: "Importado, o módulo tem __name__ igual a \"regras\". O bloco só roda quando o arquivo é executado diretamente." },
+    ],
+    pratica: [
+      passoAbrir(14),
+      {
+        titulo: "Abra também o regras.py",
+        html: `<p>Nesta etapa a pasta <b>etapa-14</b> tem <b>dois</b> programas. Abra os dois (cada um fica numa aba do VS Code).</p>
+        ${vscode({ etapa: 14, arquivoSel: "regras.py", aberto: true, linhas: [1, 13], marcas: { arquivo: 1 } })}
+        <p>São <b>4 lacunas</b>: 1 no <code>papelaria.py</code> e 3 nos testes do <code>regras.py</code>.</p>`,
+      },
+      {
+        titulo: `Lacuna 1, no papelaria.py (linha ${linhaDe(14, "from ___ import")}): importar as regras`,
+        html: `${vscode({ etapa: 14, aberto: true, linhas: [linhaDe(14, "As REGRAS"), linhaDe(14, "from ___ import") + 3], realce: "lacunas" })}
+        <p>De qual módulo vêm as funções? Escreva o nome do arquivo <b>sem</b> o <code>.py</code>.</p>`,
+      },
+      {
+        titulo: "Lacunas 2, 3 e 4, no regras.py: os resultados esperados",
+        html: `${vscode({ etapa: 14, arquivoSel: "regras.py", aberto: true, linhas: [linhaDe(14, 'if __name__ == "__main__":', "regras.py"), linhaDe(14, "menor_valor([3, 9, 2])", "regras.py")], realce: "lacunas" })}
+        ${py(`    assert calcular_frete(199.99) == ___
+    assert calcular_frete(200) == ___
+    assert maior_valor([3, 9, 2]) == ___`)}
+        <p>Calcule <b>à mão</b> o que cada função deve devolver e escreva o número. Releia a regra do frete na função <code>calcular_frete</code>, no começo do arquivo.</p>`,
+      },
+      passoSalvar(),
+      {
+        titulo: "Rode os testes do módulo",
+        html: `${cmd("python etapa-14/regras.py")}
+        ${terminal(["$ python etapa-14/regras.py", "Todos os testes de regras.py passaram!", "$"], "Se algum assert falhar, aparece AssertionError com o número da linha do teste.")}`,
+      },
+      passoRodar(14, "", 1),
+      passoVerificar(14),
+      {
+        titulo: "Revisão de código em dupla",
+        html: `<p>Troque de computador com um colega que também terminou e leia o <code>regras.py</code> dele com o roteiro da Teoria (parte 4). Anote:</p>
+        <ul><li>uma coisa que está <b>bem feita</b> e por quê;</li><li>uma <b>sugestão</b> de melhora, com a linha.</li></ul>
+        <p>Use essas anotações na reflexão da aba <b>Conferir e entregar</b>.</p>`,
+      },
+    ],
+    fim: caixa("ok", "🎉 Você construiu o Caixa v2 da Papelaria Ponto Certo!", "<p>Ele aceita compras de qualquer tamanho, imprime a nota, calcula estatísticas, ordena, parcela e mostra o relatório da semana, em dois módulos testados. No 3º bimestre, o caixa vai aprender a <b>guardar</b> as vendas em arquivos e planilhas.</p>"),
   };
 
   return E;

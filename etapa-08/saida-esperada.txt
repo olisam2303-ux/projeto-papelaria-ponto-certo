@@ -1,0 +1,72 @@
+SAÍDA ESPERADA - ETAPA 8: Vários itens (while com sentinela)
+================================================================
+Para comparar: rode  python etapa-08/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 3 itens -----------------------------------------
+Valores digitados: Caderno / 25 / Caneta / 2,50 / Mochila / 150 / (só Enter)
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Item (ou Enter para fechar a compra): Caderno
+Preço (R$): 25
+Item (ou Enter para fechar a compra): Caneta
+Preço (R$): 2,50
+Item (ou Enter para fechar a compra): Mochila
+Preço (R$): 150
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Itens: 3
+Subtotal: R$ 177.50
+Preço médio por item: R$ 59.17
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 192.50
+----------------------------------
+
+---- Teste 2 - compra vazia (só Enter) -------------------------
+Valores digitados: (só Enter)
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Itens: 0
+Subtotal: R$ 0.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 0.00
+----------------------------------
+
+---- Teste 3 - 4 agendas = R$ 200,00 ---------------------------
+Valores digitados: Agenda / 50 / Agenda / 50 / Agenda / 50 / Agenda / 50 / (só Enter)
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Itens: 4
+Subtotal: R$ 200.00
+Preço médio por item: R$ 50.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 200.00
+----------------------------------
+
+---- Teste 4 - 1 lápis com vírgula no preço --------------------
+Valores digitados: Lápis / 1,50 / (só Enter)
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Item (ou Enter para fechar a compra): Lápis
+Preço (R$): 1,50
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Itens: 1
+Subtotal: R$ 1.50
+Preço médio por item: R$ 1.50
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 16.50
+----------------------------------

@@ -93,7 +93,12 @@ def _limpar_codigo(fonte):
 
 
 def codigo_conclusao(etapa, fonte):
-    dados = ("PPC|" + str(etapa) + "|" + _limpar_codigo(fonte)).encode("utf-8")
+    # fonte: o texto do programa, ou uma lista de textos (etapas com mais de um arquivo)
+    if isinstance(fonte, (list, tuple)):
+        limpo = "|".join(_limpar_codigo(f) for f in fonte)
+    else:
+        limpo = _limpar_codigo(fonte)
+    dados = ("PPC|" + str(etapa) + "|" + limpo).encode("utf-8")
     h = 0x811C9DC5
     for b in dados:
         h ^= b
@@ -115,17 +120,21 @@ class Demorou(BaseException):
 class _Resultado:
     def __init__(self):
         self.saida = ""
-        self.erro = None        # (tipo, mensagem, linha)
+        self.erro = None        # (tipo, mensagem, linha, arquivo)
         self.entradas_usadas = 0
         self.demorou = False
 
 
-def _linha_do_aluno(tb, caminho):
-    linha = None
+def _do_aluno(nome_arquivo, pasta):
+    return os.path.dirname(os.path.abspath(nome_arquivo)) == pasta
+
+
+def _linha_do_aluno(tb, pasta):
+    linha, arquivo = None, None
     for quadro in traceback.extract_tb(tb):
-        if os.path.abspath(quadro.filename) == os.path.abspath(caminho):
-            linha = quadro.lineno
-    return linha
+        if _do_aluno(quadro.filename, pasta):
+            linha, arquivo = quadro.lineno, os.path.basename(quadro.filename)
+    return linha, arquivo
 
 
 def _rodar(codigo_compilado, caminho, entradas, res):
@@ -153,28 +162,42 @@ def _rodar(codigo_compilado, caminho, entradas, res):
                 raise Demorou()
         return rastro_local
 
+    pasta = os.path.dirname(os.path.abspath(caminho))
+
     def rastro(quadro, evento, arg):
-        if quadro.f_code.co_filename == caminho:
+        if _do_aluno(quadro.f_code.co_filename, pasta):
             return rastro_local
         return None
 
+    # Outros arquivos do aluno (ex.: regras.py) são importados de novo a cada teste.
+    if pasta not in sys.path:
+        sys.path.insert(0, pasta)
+    for nome_mod, mod in list(sys.modules.items()):
+        arq = getattr(mod, "__file__", None)
+        if arq and _do_aluno(arq, pasta):
+            del sys.modules[nome_mod]
+
     espaco = {"__name__": "__main__", "__file__": caminho,
               "__builtins__": builtins, "input": entrada_falsa}
+    input_original = builtins.input
     try:
         with contextlib.redirect_stdout(buffer):
+            builtins.input = entrada_falsa
             sys.settrace(rastro)
             try:
                 exec(codigo_compilado, espaco)
             finally:
                 sys.settrace(None)
+                builtins.input = input_original
     except Demorou:
         res.demorou = True
     except EntradasAcabaram:
-        res.erro = ("EntradasAcabaram", "", None)
+        res.erro = ("EntradasAcabaram", "", None, None)
     except SystemExit:
         pass
     except BaseException as e:  # erro do programa do aluno
-        res.erro = (type(e).__name__, str(e), _linha_do_aluno(e.__traceback__, caminho))
+        linha, arquivo = _linha_do_aluno(e.__traceback__, pasta)
+        res.erro = (type(e).__name__, str(e), linha, arquivo)
     res.saida = buffer.getvalue()
 
 
@@ -235,13 +258,21 @@ def explicar_sintaxe(e, fonte):
          "Procure: dois-pontos no fim do if/else, aspas fechadas, parênteses fechados.")
 
 
-def explicar_erro(tipo, mensagem, linha, fonte):
+def explicar_erro(tipo, mensagem, linha, fonte, arquivo=None):
     texto = _texto_da_linha(fonte, linha).strip()
-    onde = ("  Linha %s:  %s" % (linha, texto)) if linha else ""
+    onde = ("  %sLinha %s:  %s" % ((arquivo + ", ") if arquivo else "", linha, texto)) if linha else ""
     if tipo == "EntradasAcabaram":
         falhou("Seu programa pediu mais dados (input) do que este teste digita.")
-        dica("Confira se você não criou um input() a mais.\n"
-             "A ordem das perguntas deve ser a mesma do guia.")
+        dica("Confira se você não criou um input() a mais (a ordem das perguntas\n"
+             "deve ser a mesma do guia). Se a pergunta se repete sem parar, o while\n"
+             "não está perguntando o PRÓXIMO item no fim de cada volta.")
+        return
+    if tipo == "AssertionError":
+        falhou("Um teste (assert) não passou: o resultado da função não é o esperado.")
+        if onde:
+            print(onde)
+        dica("Calcule à mão o que a função deveria devolver para esses valores\n"
+             "e compare com o número escrito depois do ==.")
         return
     if tipo == "NameError":
         nome = mensagem.split("'")[1] if "'" in mensagem else mensagem
@@ -259,8 +290,21 @@ def explicar_erro(tipo, mensagem, linha, fonte):
         falhou("O programa não conseguiu converter um valor digitado.")
         if onde:
             print(onde)
-        dica("int() só aceita número inteiro (ex.: 3). float() aceita número com ponto (ex.: 2.5).\n"
-             "Confira se você usou int() na quantidade e float() no preço.")
+        texto_ruim = mensagem.split(": ", 1)[1] if ": " in mensagem else ""
+        if texto_ruim and not any(ch.isdigit() for ch in texto_ruim):
+            dica("O programa tentou transformar em número o texto %s.\n"
+                 "Isso acontece quando a ORDEM das perguntas está errada: por exemplo,\n"
+                 "o while pediu outro preço sem antes perguntar o próximo item." % texto_ruim)
+        else:
+            dica("int() só aceita número inteiro (ex.: 3). float() aceita número com ponto (ex.: 2.5).\n"
+                 "Confira se você usou int() na quantidade e float() no preço.")
+        return
+    if tipo == "IndexError":
+        falhou("O programa tentou usar uma posição que não existe na lista.")
+        if onde:
+            print(onde)
+        dica("Em Python a primeira posição é 0 e a última é len(lista) - 1.\n"
+             "Numa matriz, o primeiro índice é a LINHA e o segundo a COLUNA: vendas[i][j].")
         return
     if tipo == "TypeError":
         falhou("O programa tentou fazer uma conta com tipos que não combinam.")
@@ -320,6 +364,55 @@ def if_compara_com(arvore, numero):
     return False
 
 
+def tem_chamada(arvore, nome):
+    for n in ast.walk(arvore):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if (isinstance(f, ast.Name) and f.id == nome) or (isinstance(f, ast.Attribute) and f.attr == nome):
+                return True
+    return False
+
+
+def tem_for_com_range(arvore):
+    return any(isinstance(n, ast.For) and tem_chamada(n.iter, "range") for n in ast.walk(arvore))
+
+
+def tem_for_dentro_de_for(arvore):
+    for n in ast.walk(arvore):
+        if isinstance(n, (ast.For, ast.While)):
+            for filho in n.body:
+                if tem_no(filho, ast.For):
+                    return True
+    return False
+
+
+def tem_funcao(arvore, nome):
+    return any(isinstance(n, ast.FunctionDef) and n.name == nome for n in ast.walk(arvore))
+
+
+def tem_import(arvore, modulo):
+    for n in ast.walk(arvore):
+        if isinstance(n, ast.Import) and any(a.name == modulo for a in n.names):
+            return True
+        if isinstance(n, ast.ImportFrom) and n.module == modulo:
+            return True
+    return False
+
+
+def tem_bloco_main(arvore):
+    for n in ast.walk(arvore):
+        if isinstance(n, ast.If) and isinstance(n.test, ast.Compare):
+            partes = [n.test.left] + list(n.test.comparators)
+            if any(isinstance(p, ast.Name) and p.id == "__name__" for p in partes) and \
+               any(isinstance(p, ast.Constant) and p.value == "__main__" for p in partes):
+                return True
+    return False
+
+
+def nao_usa(arvore, *nomes):
+    return not any(tem_chamada(arvore, nome) for nome in nomes)
+
+
 # ---------- programa principal do verificador ----------
 
 def _comparavel(linha):
@@ -353,46 +446,62 @@ def _dica_da_linha(esperada, obtida):
 def principal():
     _preparar_terminal()
     pasta = os.path.dirname(os.path.abspath(__file__))
-    caminho = os.path.join(pasta, ARQUIVO)
+    arquivos = list(globals().get("ARQUIVOS") or [ARQUIVO])
+    varios = len(arquivos) > 1
+    caminhos = [os.path.join(pasta, a) for a in arquivos]
     print("=" * 60)
     print(" VERIFICADOR - Etapa %s: %s" % (ETAPA, TITULO))
-    print(" Arquivo conferido: %s" % caminho)
+    if varios:
+        print(" Arquivos conferidos: %s" % ", ".join(arquivos))
+        print(" Na pasta: %s" % pasta)
+    else:
+        print(" Arquivo conferido: %s" % caminhos[0])
     print("=" * 60)
 
-    if not os.path.exists(caminho):
-        falhou("Não encontrei o arquivo %s nesta pasta." % ARQUIVO)
-        dica("Ele precisa estar na mesma pasta que este verificar.py,\n"
-             "com o nome exatamente %s." % ARQUIVO)
-        return 1
-    try:
-        with open(caminho, "r", encoding="utf-8-sig") as f:
-            fonte = f.read()
-    except UnicodeDecodeError:
-        falhou("Não consegui ler o arquivo (codificação diferente de UTF-8).")
-        dica("No VS Code, clique em 'UTF-8' na barra azul de baixo e escolha\n"
-             "'Salvar com Codificação' > 'UTF-8'.")
-        return 1
+    fontes = {}
+    for a, caminho in zip(arquivos, caminhos):
+        if not os.path.exists(caminho):
+            falhou("Não encontrei o arquivo %s nesta pasta." % a)
+            dica("Ele precisa estar na mesma pasta que este verificar.py,\n"
+                 "com o nome exatamente %s." % a)
+            return 1
+        try:
+            with open(caminho, "r", encoding="utf-8-sig") as f:
+                fontes[a] = f.read()
+        except UnicodeDecodeError:
+            falhou("Não consegui ler o arquivo %s (codificação diferente de UTF-8)." % a)
+            dica("No VS Code, clique em 'UTF-8' na barra azul de baixo e escolha\n"
+                 "'Salvar com Codificação' > 'UTF-8'.")
+            return 1
 
     # 1) lacunas
     titulo("1) Lacunas preenchidas?")
-    vazias = [(i + 1, l.strip()) for i, l in enumerate(fonte.split("\n"))
-              if "___" in l.split("#")[0]]
+    vazias = []
+    for a in arquivos:
+        for i, l in enumerate(fontes[a].split("\n")):
+            if "___" in l.split("#")[0]:
+                vazias.append((a, i + 1, l.strip()))
     if vazias:
         falhou("Ainda faltam %d lacuna(s) ___ para completar:" % len(vazias))
-        for n, l in vazias:
-            print("    linha %d:  %s" % (n, l))
+        for a, n, l in vazias:
+            print("    %slinha %d:  %s" % ((a + ", ") if varios else "", n, l))
         dica("Troque cada ___ pela resposta certa e salve o arquivo (Ctrl+S).")
         return 1
     ok("Nenhuma lacuna ___ sobrando.")
 
     # 2) escrita (sintaxe)
     titulo("2) O Python consegue ler o programa?")
-    try:
-        compilado = compile(fonte, caminho, "exec")
-        arvore = ast.parse(fonte)
-    except SyntaxError as e:
-        explicar_sintaxe(e, fonte)
-        return 1
+    compilados, corpo = {}, []
+    for a, caminho in zip(arquivos, caminhos):
+        try:
+            compilados[a] = compile(fontes[a], caminho, "exec")
+            corpo.extend(ast.parse(fontes[a]).body)
+        except SyntaxError as e:
+            if varios:
+                print("  (no arquivo %s)" % a)
+            explicar_sintaxe(e, fontes[a])
+            return 1
+    arvore = ast.Module(body=corpo, type_ignores=[])
     ok("Sem erros de escrita.")
 
     # 3) estrutura
@@ -409,9 +518,10 @@ def principal():
     titulo("%d) Testes com compras de verdade" % (4 if REGRAS else 3))
     todos_ok = True
     for i, caso in enumerate(CASOS, 1):
-        res = executar(compilado, caminho, caso["entradas"])
+        alvo = caso.get("arquivo") or arquivos[0]
+        res = executar(compilados[alvo], os.path.join(pasta, alvo), caso["entradas"])
         nome = "Teste %d - %s" % (i, caso["nome"])
-        digitado = " / ".join(repr(x) if x == "" else x for x in caso["entradas"])
+        digitado = " / ".join(repr(x) if x == "" else x for x in caso["entradas"]) or "(nenhum)"
         if res.demorou:
             falhou(nome)
             print("  O programa não terminou: parece uma repetição sem fim.")
@@ -422,7 +532,8 @@ def principal():
         if res.erro:
             print(_c("[FALHOU] ", "vermelho") + nome)
             print("  Valores digitados: " + digitado)
-            explicar_erro(res.erro[0], res.erro[1], res.erro[2], fonte)
+            arq_erro = res.erro[3] if res.erro[3] in fontes else alvo
+            explicar_erro(res.erro[0], res.erro[1], res.erro[2], fontes[arq_erro], arq_erro if varios else None)
             todos_ok = False
             break
         problema = _conferir_caso(caso, res)
@@ -448,7 +559,8 @@ def principal():
         return 1
     print("=" * 60)
     print(_c(" PARABÉNS! A Etapa %s está completa." % ETAPA, "verde"))
-    print(" Seu CÓDIGO DE CONCLUSÃO é:  " + _c(codigo_conclusao(ETAPA, fonte), "negrito"))
+    codigo = codigo_conclusao(ETAPA, [fontes[a] for a in arquivos] if varios else fontes[arquivos[0]])
+    print(" Seu CÓDIGO DE CONCLUSÃO é:  " + _c(codigo, "negrito"))
     print(" Copie este código e cole no guia, na aba 'Conferir e entregar'.")
     print("=" * 60)
     return 0

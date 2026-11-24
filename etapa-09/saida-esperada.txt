@@ -1,0 +1,96 @@
+SAÍDA ESPERADA - ETAPA 9: Parcelamento (for com range)
+================================================================
+Para comparar: rode  python etapa-09/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - 3 itens em 3 parcelas ---------------------------
+Valores digitados: Ana / Caderno / 25 / Caneta / 2,50 / Mochila / 150 / (só Enter) / 3
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Ana
+Item (ou Enter para fechar a compra): Caderno
+Preço (R$): 25
+Item (ou Enter para fechar a compra): Caneta
+Preço (R$): 2,50
+Item (ou Enter para fechar a compra): Mochila
+Preço (R$): 150
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Ana
+===
+Itens: 3
+Subtotal: R$ 177.50
+Preço médio por item: R$ 59.17
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 192.50
+----------------------------------
+Em quantas parcelas (1 a 6)? 3
+Parcela 1 de 3: R$ 64.17
+Parcela 2 de 3: R$ 64.17
+Parcela 3 de 3: R$ 64.17
+
+---- Teste 2 - cliente com nome e sobrenome, 1 parcela ---------
+Valores digitados: Bruno Lima / Caneta / 2.50 / (só Enter) / 1
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Bruno Lima
+Item (ou Enter para fechar a compra): Caneta
+Preço (R$): 2.50
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Bruno Lima
+==========
+Itens: 1
+Subtotal: R$ 2.50
+Preço médio por item: R$ 2.50
+Frete: R$ 15.00
+TOTAL A PAGAR: R$ 17.50
+----------------------------------
+Em quantas parcelas (1 a 6)? 1
+Parcela 1 de 1: R$ 17.50
+
+---- Teste 3 - 4 agendas, 7 parcelas (inválido) ----------------
+Valores digitados: Ana / Agenda / 50 / Agenda / 50 / Agenda / 50 / Agenda / 50 / (só Enter) / 7
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Ana
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): Agenda
+Preço (R$): 50
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Ana
+===
+Itens: 4
+Subtotal: R$ 200.00
+Preço médio por item: R$ 50.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 200.00
+----------------------------------
+Em quantas parcelas (1 a 6)? 7
+Número de parcelas inválido: será 1 parcela.
+Parcela 1 de 1: R$ 200.00
+
+---- Teste 4 - compra vazia em 2 parcelas ----------------------
+Valores digitados: Carla / (só Enter) / 2
+
+=== PAPELARIA PONTO CERTO - CAIXA v2 ===
+Nome do cliente: Carla
+Item (ou Enter para fechar a compra): 
+----------------------------------
+Carla
+=====
+Itens: 0
+Subtotal: R$ 0.00
+Frete: R$ 0.00
+TOTAL A PAGAR: R$ 0.00
+----------------------------------
+Em quantas parcelas (1 a 6)? 2
+Parcela 1 de 2: R$ 0.00
+Parcela 2 de 2: R$ 0.00

@@ -4,6 +4,7 @@
   const T = {};
   const PROMPT = "PS C:\\Users\\aluno\\Documents\\papelaria-ponto-certo>";
   T.PROMPT = PROMPT;
+  T.pastaDe = (n) => "etapa-" + String(n).padStart(2, "0");
 
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   T.esc = esc;
@@ -43,7 +44,7 @@
   T.realcarLinha = realcarLinha;
   T.py = (codigo, claro) => `<pre class="codigo${claro ? " claro" : ""}">${codigo.replace(/\n$/, "").split("\n").map(realcarLinha).join("\n")}</pre>`;
   T.pseudo = (codigo) => {
-    const kw = /\b(algoritmo|var|inicio|fimalgoritmo|se|entao|senao|fimse|leia|escreva|e|ou|nao|inteiro|real|caractere|logico)\b/g;
+    const kw = /\b(algoritmo|var|inicio|fimalgoritmo|se|entao|senao|fimse|leia|escreva|e|ou|nao|inteiro|real|caractere|logico|enquanto|faca|fimenquanto|para|de|ate|passo|fimpara|cada|em|Funcao|FimFuncao|retorne|interrompa)\b/g;
     return `<pre class="codigo claro">${codigo.replace(/\n$/, "").split("\n").map((l) => {
       const p = l.indexOf("//");
       const corpo = p >= 0 ? l.slice(0, p) : l, com = p >= 0 ? l.slice(p) : "";
@@ -78,12 +79,22 @@
   function arvore(op) {
     const itens = [];
     const pasta = (nome, aberta, mk) => `<div class="vsc-item" style="padding-left:${16}px"><span class="ic">${aberta ? "⌄" : "›"}</span>${esc(nome)}${marca(mk)}</div>`;
-    for (let n = 0; n <= 7; n++) {
-      const nome = "etapa-0" + n;
+    // mostra só as pastas perto da etapa atual, para a tela não ficar enorme
+    const total = window.KIT ? Object.keys(window.KIT).length : 8;
+    const visiveis = [];
+    for (let n = 0; n < total; n++) {
+      if (total <= 8 || n === 0 || n === total - 1 || Math.abs(n - op.etapa) <= 1 || (op.etapa < 0 && n <= 7)) visiveis.push(n);
+    }
+    let anterior = -1;
+    for (const n of visiveis) {
+      if (n - anterior > 1) itens.push(`<div class="vsc-item" style="padding-left:30px;color:#6e7681">⋯</div>`);
+      anterior = n;
+      const nome = T.pastaDe(n);
       const aberta = op.etapa === n;
       itens.push(pasta(nome, aberta, aberta ? op.marcas.pasta : null));
       if (aberta) {
-        const arqs = n === 0 ? ["ola.py", "saida-esperada.txt", "verificar.py"] : ["papelaria.py", "saida-esperada.txt", "verificar.py"];
+        const doKit = window.KIT && window.KIT[n] && window.KIT[n].arquivos ? window.KIT[n].arquivos.map((x) => x.nome) : [n === 0 ? "ola.py" : "papelaria.py"];
+        const arqs = [...doKit, "saida-esperada.txt", "verificar.py"].sort((x, y) => x.localeCompare(y));
         for (const a of arqs) {
           const sel = op.arquivoSel === a;
           const ic = a.endsWith(".py") ? '<span class="ic py">py</span>' : '<span class="ic txt">≡</span>';
@@ -99,11 +110,11 @@
 
   function editor(op) {
     const kit = window.KIT && window.KIT[op.etapa];
-    let texto = op.codigo != null ? op.codigo : kit ? kit.inicio : "";
+    let texto = op.codigo != null ? op.codigo : kit ? T.inicioDe(op.etapa, op.arquivoSel) : "";
     const linhas = texto.replace(/\n$/, "").split("\n");
     let [a, b] = op.linhas || [1, Math.min(linhas.length, 14)];
-    if (typeof a === "string") a = T.linhaDe(op.etapa, a);
-    if (typeof b === "string") b = T.linhaDe(op.etapa, b);
+    if (typeof a === "string") a = T.linhaDe(op.etapa, a, op.arquivoSel);
+    if (typeof b === "string") b = T.linhaDe(op.etapa, b, op.arquivoSel);
     a = Math.max(1, a); b = Math.min(linhas.length, b);
     const realce = new Set(op.realce === "lacunas" ? linhas.map((l, i) => (l.includes("___") ? i + 1 : 0)).filter(Boolean) : op.realce || []);
     let h = a > 1 ? `<div class="vsc-reticencias">⋯</div>` : "";
@@ -180,10 +191,21 @@
     </div><p class="tela-legenda">Em <b>Destino</b>, escolha <b>Salvar como PDF</b> <span class="marca">1</span> (não escolha uma impressora) e clique em <b>Salvar</b> <span class="marca">2</span>.</p></div>`;
 
   // número da linha do arquivo inicial da etapa que contém um trecho
-  T.linhaDe = (etapa, trecho) => {
+  // texto inicial de um arquivo da etapa (o principal, se o nome não for dado)
+  T.inicioDe = (etapa, arquivo) => {
     const k = window.KIT && window.KIT[etapa];
-    if (!k) return 1;
-    const i = k.inicio.split("\n").findIndex((l) => l.includes(trecho));
+    if (!k) return "";
+    if (arquivo && k.arquivos) {
+      const a = k.arquivos.find((x) => x.nome === arquivo);
+      if (a) return a.inicio;
+    }
+    return k.inicio;
+  };
+  T.linhaDe = (etapa, trecho, arquivo) => {
+    const texto = T.inicioDe(etapa, arquivo);
+    if (!texto) return 1;
+    const i = texto.split("\n").findIndex((l) => l.includes(trecho));
+    if (i < 0) console.warn("linhaDe: trecho não encontrado", etapa, arquivo, trecho);
     return i >= 0 ? i + 1 : 1;
   };
 
