@@ -20,8 +20,9 @@
   const BIMESTRES = [
     { b: 1, nome: "1º bimestre · O Caixa", semanas: "Semanas 01 a 07", pdf: "Apostila_Guia_Papelaria_Ponto_Certo_1bim.pdf" },
     { b: 2, nome: "2º bimestre · O Caixa que repete", semanas: "Semanas 08 a 14", pdf: "Apostila_Guia_Papelaria_Ponto_Certo_2bim.pdf" },
+    { b: 3, nome: "3º bimestre · O Fechamento do dia", semanas: "Semanas 15 a 20", pdf: "Apostila_Guia_Papelaria_Ponto_Certo_3bim.pdf" },
   ];
-  const bimDe = (n) => (n <= 7 ? 1 : 2);
+  const bimDe = (n) => (n <= 7 ? 1 : n <= 14 ? 2 : 3);
 
   // ---------- código de conclusão (idêntico ao do verificar.py) ----------
   const ESPACOS = new Set([" ", "\t", "\r", "\n", "\f", "\v", " ", "﻿"]);
@@ -81,9 +82,9 @@
     return `
     <section class="capa">
       <div>
-        <span class="etiqueta">Lógica de Programação · 1º e 2º bimestres</span>
+        <span class="etiqueta">Lógica de Programação · 1º, 2º e 3º bimestres</span>
         <h1>Projeto Papelaria Ponto Certo</h1>
-        <p class="sub">Uma etapa por semana, você constrói em Python o <b>caixa de uma papelaria</b>. No 1º bimestre nasce o <b>Caixa v1</b> (uma venda com decisões); no 2º, o <b>Caixa v2</b> (várias compras, listas, matriz e funções).</p>
+        <p class="sub">Uma etapa por semana, você constrói em Python o <b>caixa de uma papelaria</b>. No 1º bimestre nasce o <b>Caixa v1</b> (uma venda com decisões); no 2º, o <b>Caixa v2</b> (várias compras, listas, matriz e funções); no 3º, o <b>Caixa v3</b> (o fechamento do dia, com testes, textos e arquivos).</p>
         ${barra()}
         <a class="botao" href="#etapa-${p}">${p > 0 ? "Continuar: Etapa " + p : "Começar pela Etapa 0"} →</a>
         ${BIMESTRES.map((x) => `<a class="botao sec" href="${x.pdf}" target="_blank" rel="noopener">📄 Apostila ${x.b}º bim.</a>`).join(" ")}

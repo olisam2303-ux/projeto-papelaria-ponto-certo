@@ -1,4 +1,4 @@
-PROJETO PAPELARIA PONTO CERTO - Lógica de Programação, 1º e 2º bimestres
+PROJETO PAPELARIA PONTO CERTO - Lógica de Programação, 1º, 2º e 3º bimestres
 ====================================================================
 
 COMO COMEÇAR
@@ -11,11 +11,12 @@ O QUE TEM AQUI
   index.html        o guia do projeto (teoria, prática e entrega)
   Apostila_Guia_Papelaria_Ponto_Certo_1bim.pdf  (etapas 0 a 7)
   Apostila_Guia_Papelaria_Ponto_Certo_2bim.pdf  (etapas 8 a 14)
+  Apostila_Guia_Papelaria_Ponto_Certo_3bim.pdf  (etapas 15 a 20)
                     o mesmo conteúdo do guia, em PDF, para ler ou imprimir
   guia/             arquivos do guia (não mexa)
-  etapa-00 a 14/    uma pasta por etapa, cada uma com:
+  etapa-00 a 20/    uma pasta por etapa, cada uma com:
       papelaria.py        o programa que VOCÊ completa (na etapa 0: ola.py;
-                          na etapa 14 também o regras.py)
+                          nas etapas 14 a 20 também regras.py ou testes.py)
       verificar.py        o conferidor: só rode, não altere
       saida-esperada.txt  o que deve aparecer na tela, para comparar
 

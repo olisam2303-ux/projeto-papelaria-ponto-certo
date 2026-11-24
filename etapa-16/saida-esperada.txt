@@ -1,0 +1,69 @@
+SAÍDA ESPERADA - ETAPA 16: Planilha da semana (matriz)
+================================================================
+Para comparar: rode  python etapa-16/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - relatório do dia (o programa inteiro) -----------
+Valores digitados: (nenhum: o programa não faz perguntas)
+
+=== PAPELARIA PONTO CERTO - FECHAMENTO DO DIA ===
+Vendas do dia: 6
+Total do dia: R$ 544.90
+Média por venda: R$ 90.82
+Vendas acima da média: 2
+A primeira venda de R$ 15,00 foi a de número 3
+Nenhuma venda de R$ 999,00 hoje.
+PLANILHA DA SEMANA (R$)
+Dia     Dinheiro       PIX    Cartão     Total
+Seg       120.00    340.50    210.00    670.50
+Ter        95.00    410.00    180.50    685.50
+Qua       150.50    290.00    260.00    700.50
+Qui        80.00    505.50    199.90    785.40
+Sex       210.00    620.00    330.00   1160.00
+Total     655.50   2166.00   1180.40   4001.90
+
+---- Teste 2 - totais das linhas de [[1, 2], [3, 4]] -----------
+Chamada: totais_das_linhas([[1, 2], [3, 4]])
+
+Resultado esperado: [3, 7]
+
+---- Teste 3 - totais das linhas de [[5]] ----------------------
+Chamada: totais_das_linhas([[5]])
+
+Resultado esperado: [5]
+
+---- Teste 4 - totais das colunas de [[1, 2], [3, 4]] ----------
+Chamada: totais_das_colunas([[1, 2], [3, 4]])
+
+Resultado esperado: [4, 6]
+
+---- Teste 5 - totais das colunas de uma matriz 1 x 3 ----------
+Chamada: totais_das_colunas([[1, 2, 3]])
+
+Resultado esperado: [1, 2, 3]
+
+---- Teste 6 - totais das colunas de uma matriz 3 x 1 ----------
+Chamada: totais_das_colunas([[1], [2], [3]])
+
+Resultado esperado: [6]
+
+---- Teste 7 - soma de [10, 20, 30] ----------------------------
+Chamada: soma([10, 20, 30])
+
+Resultado esperado: 60
+
+---- Teste 8 - soma de um vetor vazio --------------------------
+Chamada: soma([])
+
+Resultado esperado: 0
+
+---- Teste 9 - média de [10, 20] -------------------------------
+Chamada: media([10, 20])
+
+Resultado esperado: 15.0
+
+---- Teste 10 - média de um vetor vazio ------------------------
+Chamada: media([])
+
+Resultado esperado: 0

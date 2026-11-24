@@ -1,0 +1,81 @@
+SAÍDA ESPERADA - ETAPA 17: Funções e escopo
+================================================================
+Para comparar: rode  python etapa-17/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - relatório do dia (o programa inteiro) -----------
+Valores digitados: (nenhum: o programa não faz perguntas)
+
+=== PAPELARIA PONTO CERTO - FECHAMENTO DO DIA ===
+Vendas do dia: 6
+Total do dia: R$ 544.90
+Média por venda: R$ 90.82
+Vendas acima da média: 2
+A primeira venda de R$ 15,00 foi a de número 3
+Nenhuma venda de R$ 999,00 hoje.
+Conferência do caixa: R$ 544.90
+Média com o desconto VIP de 10%: R$ 81.73
+PLANILHA DA SEMANA (R$)
+Dia     Dinheiro       PIX    Cartão     Total
+Seg       120.00    340.50    210.00    670.50
+Ter        95.00    410.00    180.50    685.50
+Qua       150.50    290.00    260.00    700.50
+Qui        80.00    505.50    199.90    785.40
+Sex       210.00    620.00    330.00   1160.00
+Total     655.50   2166.00   1180.40   4001.90
+
+---- Teste 2 - desconto de 10% em 200 --------------------------
+Chamada: aplicar_desconto(200, 10)
+
+Resultado esperado: 180.0
+
+---- Teste 3 - desconto de 0% em 50 ----------------------------
+Chamada: aplicar_desconto(50, 0)
+
+Resultado esperado: 50.0
+
+---- Teste 4 - desconto de 25% em 80 ---------------------------
+Chamada: aplicar_desconto(80, 25)
+
+Resultado esperado: 60.0
+
+---- Teste 5 - registrar venda de 42,50 num caixa com 100 ------
+Chamada: registrar_venda(100, 42.5)
+
+Resultado esperado: 142.5
+
+---- Teste 6 - registrar venda de 0 num caixa vazio ------------
+Chamada: registrar_venda(0, 0)
+
+Resultado esperado: 0
+
+---- Teste 7 - totais das linhas de [[1, 2], [3, 4]] -----------
+Chamada: totais_das_linhas([[1, 2], [3, 4]])
+
+Resultado esperado: [3, 7]
+
+---- Teste 8 - totais das linhas de [[5]] ----------------------
+Chamada: totais_das_linhas([[5]])
+
+Resultado esperado: [5]
+
+---- Teste 9 - soma de [10, 20, 30] ----------------------------
+Chamada: soma([10, 20, 30])
+
+Resultado esperado: 60
+
+---- Teste 10 - soma de um vetor vazio -------------------------
+Chamada: soma([])
+
+Resultado esperado: 0
+
+---- Teste 11 - média de [10, 20] ------------------------------
+Chamada: media([10, 20])
+
+Resultado esperado: 15.0
+
+---- Teste 12 - média de um vetor vazio ------------------------
+Chamada: media([])
+
+Resultado esperado: 0

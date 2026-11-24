@@ -137,7 +137,38 @@ def _linha_do_aluno(tb, pasta):
     return linha, arquivo
 
 
-def _rodar(codigo_compilado, caminho, entradas, res):
+def _pasta_temporaria():
+    import tempfile
+    return tempfile.mkdtemp(prefix="verificador-")
+
+
+def arquivo_teste(conteudo):
+    """Cria um arquivo temporário com o conteúdo dado e devolve o caminho dele."""
+    caminho = os.path.join(_pasta_temporaria(), "teste.txt")
+    with open(caminho, "w", encoding="utf-8", newline="") as f:
+        f.write(conteudo)
+    return caminho
+
+
+def caminho_teste():
+    """Devolve o caminho de um arquivo temporário que ainda NÃO existe."""
+    return os.path.join(_pasta_temporaria(), "saida.txt")
+
+
+def ler_texto(caminho):
+    with open(caminho, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def _avaliar(expressao, espaco):
+    """Executa as linhas de preparação e devolve o valor da ÚLTIMA linha."""
+    linhas = [l for l in expressao.strip().split("\n") if l.strip()]
+    for l in linhas[:-1]:
+        exec(l, espaco)
+    return eval(linhas[-1], espaco)
+
+
+def _rodar(codigo_compilado, caminho, entradas, res, expressao=None):
     buffer = io.StringIO()
     fila = list(entradas)
 
@@ -170,14 +201,20 @@ def _rodar(codigo_compilado, caminho, entradas, res):
         return None
 
     # Outros arquivos do aluno (ex.: regras.py) são importados de novo a cada teste.
-    if pasta not in sys.path:
-        sys.path.insert(0, pasta)
+    if pasta in sys.path:
+        sys.path.remove(pasta)
+    sys.path.insert(0, pasta)
+    try:
+        nomes_da_pasta = set(a[:-3] for a in os.listdir(pasta) if a.endswith(".py"))
+    except OSError:
+        nomes_da_pasta = set()
     for nome_mod, mod in list(sys.modules.items()):
         arq = getattr(mod, "__file__", None)
-        if arq and _do_aluno(arq, pasta):
+        if (arq and _do_aluno(arq, pasta)) or nome_mod in nomes_da_pasta:
             del sys.modules[nome_mod]
 
-    espaco = {"__name__": "__main__", "__file__": caminho,
+    # Teste de função: carrega o arquivo como módulo (o main NÃO roda) e avalia a chamada.
+    espaco = {"__name__": "__main__" if expressao is None else "modulo_do_aluno", "__file__": caminho,
               "__builtins__": builtins, "input": entrada_falsa}
     input_original = builtins.input
     try:
@@ -186,6 +223,9 @@ def _rodar(codigo_compilado, caminho, entradas, res):
             sys.settrace(rastro)
             try:
                 exec(codigo_compilado, espaco)
+                if expressao is not None:
+                    espaco.update({"arquivo_teste": arquivo_teste, "caminho_teste": caminho_teste, "ler_texto": ler_texto})
+                    res.valor = _avaliar(expressao, espaco)
             finally:
                 sys.settrace(None)
                 builtins.input = input_original
@@ -201,10 +241,22 @@ def _rodar(codigo_compilado, caminho, entradas, res):
     res.saida = buffer.getvalue()
 
 
-def executar(codigo_compilado, caminho, entradas):
+def executar(codigo_compilado, caminho, entradas, expressao=None):
     res = _Resultado()
-    _rodar(codigo_compilado, caminho, entradas, res)
+    res.valor = None
+    _rodar(codigo_compilado, caminho, entradas, res, expressao)
     return res
+
+
+def iguais(a, b):
+    """Compara resultados aceitando diferenças minúsculas de arredondamento."""
+    if isinstance(a, bool) or isinstance(b, bool):
+        return a is b
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        return abs(a - b) < 1e-6
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        return len(a) == len(b) and all(iguais(x, y) for x, y in zip(a, b))
+    return a == b
 
 
 # ---------- explicações amigáveis ----------
@@ -287,17 +339,19 @@ def explicar_erro(tipo, mensagem, linha, fonte, arquivo=None):
                  "em todos os caminhos do if/else.")
         return
     if tipo == "ValueError":
-        falhou("O programa não conseguiu converter um valor digitado.")
+        falhou("O programa não conseguiu transformar um texto em número.")
         if onde:
             print(onde)
         texto_ruim = mensagem.split(": ", 1)[1] if ": " in mensagem else ""
+        if texto_ruim:
+            print("  Texto que não virou número: %s" % texto_ruim)
         if texto_ruim and not any(ch.isdigit() for ch in texto_ruim):
-            dica("O programa tentou transformar em número o texto %s.\n"
-                 "Isso acontece quando a ORDEM das perguntas está errada: por exemplo,\n"
-                 "o while pediu outro preço sem antes perguntar o próximo item." % texto_ruim)
+            dica("Esse texto não tem número nenhum. Se ele veio do teclado, a ORDEM das\n"
+                 "perguntas está errada (ex.: o while pediu outro preço sem antes perguntar\n"
+                 "o próximo item). Se veio de um arquivo, confira se o cabeçalho foi pulado.")
         else:
             dica("int() só aceita número inteiro (ex.: 3). float() aceita número com ponto (ex.: 2.5).\n"
-                 "Confira se você usou int() na quantidade e float() no preço.")
+                 "Se o texto veio de um fatiamento [início:fim] ou de um split, confira os índices.")
         return
     if tipo == "IndexError":
         falhou("O programa tentou usar uma posição que não existe na lista.")
@@ -407,6 +461,10 @@ def tem_bloco_main(arvore):
                any(isinstance(p, ast.Constant) and p.value == "__main__" for p in partes):
                 return True
     return False
+
+
+def conta_no(arvore, classe):
+    return sum(1 for n in ast.walk(arvore) if isinstance(n, classe))
 
 
 def nao_usa(arvore, *nomes):
@@ -519,8 +577,30 @@ def principal():
     todos_ok = True
     for i, caso in enumerate(CASOS, 1):
         alvo = caso.get("arquivo") or arquivos[0]
-        res = executar(compilados[alvo], os.path.join(pasta, alvo), caso["entradas"])
         nome = "Teste %d - %s" % (i, caso["nome"])
+        if "expressao" in caso:  # teste de função: chama e confere o que ela devolve
+            res = executar(compilados[alvo], os.path.join(pasta, alvo), [], caso["expressao"])
+            chamada = caso["expressao"].strip().split("\n")[-1]
+            if res.demorou or res.erro or not iguais(res.valor, caso["valor"]):
+                falhou(nome)
+                print("  Chamada:           " + chamada)
+                print("  Deveria devolver:  " + repr(caso["valor"]))
+                if res.demorou:
+                    print("  Devolveu:          (não terminou: repetição sem fim?)")
+                    dica("Confira se a variável do while muda dentro da repetição.")
+                elif res.erro:
+                    print("  Devolveu:          (o programa parou com erro)")
+                    arq_erro = res.erro[3] if res.erro[3] in fontes else alvo
+                    explicar_erro(res.erro[0], res.erro[1], res.erro[2], fontes[arq_erro], arq_erro if varios else None)
+                else:
+                    print("  Devolveu:          " + repr(res.valor))
+                    if caso.get("dica"):
+                        dica(caso["dica"])
+                todos_ok = False
+                break
+            ok(nome)
+            continue
+        res = executar(compilados[alvo], os.path.join(pasta, alvo), caso["entradas"])
         digitado = " / ".join(repr(x) if x == "" else x for x in caso["entradas"]) or "(nenhum)"
         if res.demorou:
             falhou(nome)

@@ -1,4 +1,4 @@
-// Conteúdo das etapas (1º e 2º bimestres): TEORIA (separada) + PRÁTICA passo a passo.
+// Conteúdo das etapas (1º, 2º e 3º bimestres): TEORIA (separada) + PRÁTICA passo a passo.
 // Os códigos mostrados vêm de dados-gerados.js (gerado pelo build a partir dos arquivos reais do kit).
 window.montarGuia = function () {
   const { py, compara, caixa, dica, cmd, vscode, terminal, linhaDe, esc } = window.T;
@@ -11,11 +11,11 @@ window.montarGuia = function () {
     const lista = [];
     for (let i = 1; i < partes.length; i += 3) {
       const corpo = partes[i + 2].replace(/^\n/, "").split("\n");
-      const comando = corpo[0].startsWith("Comando:");
+      const comando = corpo[0].startsWith("Comando:") || corpo[0].startsWith("Chamada:") || corpo[0].includes("(nenhum");
       const ent = comando ? [] : corpo[0].replace("Valores digitados: ", "").split(" / ").map((x) => (x === "(só Enter)" ? "" : x));
       const linhas = corpo.slice(2).filter((l, j, arr) => !(j === arr.length - 1 && l === ""));
       while (linhas.length && linhas[linhas.length - 1] === "") linhas.pop();
-      lista.push({ num: Number(partes[i]), nome: partes[i + 1], entradas: ent, linhas });
+      lista.push({ num: Number(partes[i]), nome: partes[i + 1], entradas: ent, linhas, funcao: corpo[0].startsWith("Chamada:") });
     }
     return lista;
   }
@@ -114,13 +114,14 @@ window.montarGuia = function () {
       html: `<ol class="faca">
         <li>Se o terminal não estiver aberto embaixo, abra pelo menu <b>Terminal › Novo Terminal</b>.</li>
         <li>Digite o comando abaixo e aperte <kbd>Enter</kbd> (ou clique em <b>Copiar</b> e cole no terminal com o botão direito do mouse ou <kbd>Ctrl</kbd>+<kbd>V</kbd>):${cmd(c)}</li>
-        <li>O programa vai fazer perguntas. Digite ${digitar}, apertando <kbd>Enter</kbd> depois de cada resposta.</li>
-        <li>Compare o resultado com a tela abaixo. Os valores em <span style="color:#1d6fa5;font-weight:700">azul</span> são os que você digita.</li>
+        ${t.entradas.length ? `<li>O programa vai fazer perguntas. Digite ${digitar}, apertando <kbd>Enter</kbd> depois de cada resposta.</li>
+        <li>Compare o resultado com a tela abaixo. Os valores em <span style="color:#1d6fa5;font-weight:700">azul</span> são os que você digita.</li>` : `<li>Este programa <b>não faz perguntas</b>: ele analisa as vendas e mostra o relatório direto.</li>
+        <li>Compare o resultado com a tela abaixo, linha por linha.</li>`}
       </ol>
-      ${terminal(["$ " + c, ...transcricao(n, t), "$"], `Tela esperada para o <b>Teste 1 - ${esc(t.nome)}</b>. Os outros testes estão no arquivo <code>saida-esperada.txt</code> da pasta ${pasta(n)}.`)}
+      ${terminal(["$ " + c, ...transcricao(n, t), "$"], `Tela esperada para o <b>Teste ${t.num} - ${esc(t.nome)}</b>. Os outros testes estão no arquivo <code>saida-esperada.txt</code> da pasta ${pasta(n)}.`)}
       ${extra}
       ${dica("Apareceu uma mensagem de erro em vermelho?", `<p>Leia a <b>última linha</b>: ela diz o tipo do erro. A linha de cima mostra <b>onde</b> (o número da linha). Corrija, salve e rode de novo. Os erros mais comuns estão na página <a href="#ajuda">Problemas comuns</a>.</p>`, "problema")}
-      ${dica("O programa ficou parado esperando?", `<p>Ele está esperando você digitar uma resposta. Se quiser cancelar a execução, clique no terminal e aperte <kbd>Ctrl</kbd> + <kbd>C</kbd>.</p>`)}`,
+      ${t.entradas.length ? dica("O programa ficou parado esperando?", `<p>Ele está esperando você digitar uma resposta. Se quiser cancelar a execução, clique no terminal e aperte <kbd>Ctrl</kbd> + <kbd>C</kbd>.</p>`) : ""}`,
     };
   }
   function passoVerificar(n) {
@@ -1371,6 +1372,482 @@ ${caixa("info", "Teste os limites", "<p>Os bons testes ficam nas fronteiras das 
       },
     ],
     fim: caixa("ok", "🎉 Você construiu o Caixa v2 da Papelaria Ponto Certo!", "<p>Ele aceita compras de qualquer tamanho, imprime a nota, calcula estatísticas, ordena, parcela e mostra o relatório da semana, em dois módulos testados. No 3º bimestre, o caixa vai aprender a <b>guardar</b> as vendas em arquivos e planilhas.</p>"),
+  };
+
+  // =====================================================================
+  // 3º BIMESTRE · O FECHAMENTO DO DIA (Caixa v3)
+  // =====================================================================
+  const exemploFalhaFuncao = (n, nome, chamada, deveria, devolveu, d) => terminal([
+    "[FALHOU] Teste 4 - " + nome, "  Chamada:           " + chamada, "  Deveria devolver:  " + deveria, "  Devolveu:          " + devolveu, "  DICA: " + d],
+    "Exemplo de falha num teste de função: o verificador chamou a função com esses valores e conferiu o que ela devolveu.");
+
+  // ---------------------------------------------------------------- ETAPA 15
+  E[15] = {
+    n: 15, semana: "Semana 15", tema: "Vetores em Python: percurso, busca e estatísticas",
+    titulo: "Estatísticas do dia (vetores)",
+    resumo: "Nasce o Caixa v3: no fim do dia, ele soma, tira a média e procura vendas num vetor.",
+    objetivos: ["Percorrer um vetor com while, usando um índice e uma condição de parada.", "Fazer uma busca linear que devolve a posição (ou -1).", "Calcular estatísticas simples sem funções prontas."],
+    teoria: `
+<h2>1. O Caixa v3: o fechamento do dia</h2>
+<p>Nos bimestres anteriores o caixa atendia <b>um cliente</b>. Agora, no fim do expediente, o dono quer saber <b>como foi o dia</b>: total vendido, média, vendas grandes... O Caixa v3 <b>não faz perguntas</b>: ele recebe as vendas do dia e mostra os relatórios.</p>
+${caixa("info", "Já começa organizado em funções", "<p>Como você aprendeu na Etapa 13, o programa tem <b>funções</b> (cada uma com uma tarefa) e o <code>main()</code>. Isso permite ao verificador <b>testar cada função sozinha</b>, com vários valores diferentes: é assim que os programadores testam programas de verdade.</p>")}
+
+<h2>2. Vetor: revisão rápida</h2>
+<table class="tab"><tr><th>Código</th><th>Resultado</th></tr>
+<tr><td><code>totais = [42.5, 177.5, 15.0]</code></td><td>um vetor com 3 vendas</td></tr>
+<tr><td><code>totais[0]</code></td><td>42.5 (a primeira posição é 0)</td></tr>
+<tr><td><code>len(totais)</code></td><td>3</td></tr>
+<tr><td><code>totais[3]</code></td><td><b>IndexError</b>: a última posição é <code>len - 1</code> = 2</td></tr></table>
+
+<h2>3. Percorrer com while: índice e condição de parada</h2>
+<p>O <code>for</code> é o jeito mais curto de percorrer, mas o <code>while</code> mostra o que acontece por dentro: um <b>índice</b> <code>i</code> começa em 0, avança de 1 em 1, e a <b>condição de parada</b> <code>i &lt; len(valores)</code> impede passar do fim.</p>
+${compara(`total <- 0
+i <- 1
+enquanto i <= n faca
+   total <- total + valores[i]
+   i <- i + 1
+fimenquanto`, `total = 0
+i = 0
+while i < len(valores):
+    total = total + valores[i]
+    i = i + 1`)}
+${caixa("atencao", "Python começa no 0", "<p>No Visualg o índice vai de 1 até n (<code>&lt;=</code>). No Python vai de 0 até <code>len - 1</code>, por isso a condição é <code>i &lt; len(valores)</code>. Com <code>&lt;=</code> o laço tenta ler uma posição que não existe (IndexError). Sem o <code>i = i + 1</code>, o laço nunca acaba.</p>")}
+
+<h2>4. Busca linear</h2>
+<p>Procurar um valor olhando posição por posição, do começo ao fim, até achar. A condição tem <b>duas partes</b>:</p>
+${py(`i = 0
+while i < len(valores) and valores[i] != alvo:
+    i = i + 1
+# saiu do laço: ou achou (valores[i] == alvo) ou acabou o vetor`)}
+<ul><li><code>i &lt; len(valores)</code>: ainda há posições para olhar;</li><li><code>valores[i] != alvo</code>: ainda não achou.</li></ul>
+<p>A ordem importa: o Python testa da esquerda para a direita e, com <code>and</code>, para no primeiro falso. Assim, quando <code>i</code> chega ao fim, ele nem tenta ler <code>valores[i]</code>. Se não achar, a função devolve <b>-1</b>, uma posição que não existe: é a convenção para “não encontrado”.</p>
+
+<h2>5. Estatísticas</h2>
+<table class="tab"><tr><th>Função</th><th>O que devolve</th></tr>
+<tr><td><code>soma(valores)</code></td><td>a soma de todos</td></tr>
+<tr><td><code>media(valores)</code></td><td>soma ÷ quantidade, ou 0 se o vetor estiver vazio</td></tr>
+<tr><td><code>posicao_de(valores, alvo)</code></td><td>a posição do 1º valor igual ao alvo, ou -1</td></tr>
+<tr><td><code>quantos_acima(valores, limite)</code></td><td>quantos valores são maiores que o limite</td></tr></table>
+<p>Nesta etapa o verificador não aceita <code>sum()</code> nem <code>.index()</code> prontos: o objetivo é escrever o algoritmo.</p>`,
+    quiz: [
+      { p: "Com valores = [4, 7], qual condição percorre o vetor sem dar IndexError?", ops: ["while i <= len(valores):", "while i < len(valores):", "while i < len(valores) + 1:", "while i != 0:"], certa: 1, expl: "As posições são 0 e 1. Com i < 2 o laço para antes do 2, que não existe." },
+      { p: "posicao_de([5, 8, 8], 8) devolve:", ops: ["1", "2", "8", "-1"], certa: 0, expl: "A busca para no PRIMEIRO 8 encontrado, na posição 1." },
+      { p: "Por que media([]) deve devolver 0 antes de dividir?", ops: ["Porque 0 é a média de qualquer vetor", "Para não dividir por zero (len([]) é 0)", "Porque o Python exige", "Para economizar memória"], certa: 1, expl: "Dividir por len([]) seria dividir por zero, e o programa pararia com ZeroDivisionError." },
+    ],
+    pratica: [
+      passoAbrir(15),
+      {
+        titulo: "Conheça o Caixa v3",
+        html: `<p>O arquivo é novo. Role e encontre: o vetor <code>TOTAIS_DO_DIA</code> (as vendas de hoje), as <b>4 funções</b> da Etapa 15 e o <code>main()</code>, que monta o relatório. São <b>5 lacunas</b>, todas dentro das funções.</p>
+        ${vscode({ etapa: 15, aberto: true, linhas: [linhaDe(15, "TOTAIS_DO_DIA = ") - 1, linhaDe(15, "return soma(valores) /")], realce: "lacunas" })}`,
+      },
+      {
+        titulo: `Lacunas 1 e 2 (linhas ${linhaDe(15, "while i ___ len")} e ${linhaDe(15, "i = ___")}): o percurso da soma`,
+        html: `${py(`    while i ___ len(valores):
+        total = total + valores[i]
+        i = ___`)}
+        ${caixa("pense", "Pense", "<p>1. Que comparador faz o laço parar <b>antes</b> de <code>len(valores)</code>? (Releia o quadro “Python começa no 0”.)<br>2. Para ir à próxima posição, quanto <code>i</code> deve valer? Escreva a conta completa.</p>")}`,
+      },
+      {
+        titulo: `Lacuna 3 (linha ${linhaDe(15, "return soma(valores) /")}): a média`,
+        html: `${py(`    return soma(valores) / ___`)}<p>Média = soma ÷ <b>quantidade</b> de valores. Qual função diz quantos valores o vetor tem?</p>`,
+      },
+      {
+        titulo: "Lacunas 4 e 5: a busca linear",
+        html: `${vscode({ etapa: 15, aberto: true, linhas: [linhaDe(15, "def posicao_de"), linhaDe(15, "    return ___")], realce: "lacunas" })}
+        <ul><li><b>Lacuna 4:</b> o laço continua enquanto o valor da posição for <b>diferente</b> do alvo. Qual comparador?</li>
+        <li><b>Lacuna 5:</b> se o laço acabou sem achar, o que a função devolve? (Releia a Teoria, parte 4.)</li></ul>`,
+      },
+      passoSalvar(),
+      passoRodar(15),
+      {
+        titulo: "Rode o verificador (agora ele também testa as funções)",
+        html: `${cmd("python etapa-15/verificar.py")}
+        <p>Primeiro ele roda o programa inteiro e compara o relatório. Depois <b>chama cada função</b> com valores diferentes, inclusive casos difíceis, como um vetor vazio. Se uma falhar, ele mostra a chamada, o que deveria devolver e o que devolveu:</p>
+        ${exemploFalhaFuncao(15, "média de um vetor vazio", "media([])", "0", "(o programa parou com erro)", "Vetor vazio: a função devolve 0 antes de dividir.")}
+        <p>Com <b>PARABÉNS</b> e o código de conclusão na tela, vá para a aba <a href="#etapa-15/entregar"><b>3 · Conferir e entregar</b></a>.</p>`,
+      },
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 16
+  E[16] = {
+    n: 16, semana: "Semana 16", tema: "Matrizes: percurso, agregação e planilha de vendas",
+    titulo: "Planilha da semana (matriz)",
+    resumo: "O fechamento ganha a planilha da semana: total de cada dia e de cada forma de pagamento.",
+    objetivos: ["Representar uma planilha como matriz (lista de listas).", "Somar cada linha e cada coluna com laços aninhados e devolver o resultado numa lista.", "Ler uma tabela alinhada com f-strings."],
+    teoria: `
+<h2>1. A planilha da semana</h2>
+<p>O dono anota quanto entrou (em R$) em cada dia, por forma de pagamento. Cada <b>linha</b> é um dia e cada <b>coluna</b> é uma forma de pagamento:</p>
+<table class="tab"><tr><th></th><th>Dinheiro (0)</th><th>PIX (1)</th><th>Cartão (2)</th></tr>
+<tr><th>Seg (0)</th><td>120.00</td><td>340.50</td><td>210.00</td></tr>
+<tr><th>Ter (1)</th><td>95.00</td><td>410.00</td><td>180.50</td></tr>
+<tr><th>Qua (2)</th><td>150.50</td><td>290.00</td><td>260.00</td></tr>
+<tr><th>Qui (3)</th><td>80.00</td><td>505.50</td><td>199.90</td></tr>
+<tr><th>Sex (4)</th><td>210.00</td><td>620.00</td><td>330.00</td></tr></table>
+<p>Em Python, é uma <b>lista de listas</b>: <code>planilha[1][2]</code> é a linha 1 (Ter), coluna 2 (Cartão) = 180.50.</p>
+
+<h2>2. Somar cada linha: o total de cada dia</h2>
+${compara(`para i de 1 ate 5 faca
+   soma_linha <- 0
+   para j de 1 ate 3 faca
+      soma_linha <- soma_linha + m[i, j]
+   fimpara
+   // guarda soma_linha
+fimpara`, `totais = []
+for linha in matriz:
+    soma_linha = 0
+    for valor in linha:
+        soma_linha = soma_linha + valor
+    totais.append(soma_linha)`)}
+<p>A função <b>devolve uma lista</b> com um total por linha: <code>totais_das_linhas([[1, 2], [3, 4]])</code> devolve <code>[3, 7]</code>.</p>
+${caixa("atencao", "O acumulador renasce a cada linha", "<p><code>soma_linha = 0</code> fica <b>dentro</b> do laço de fora. Se ficar fora, a terça soma também a segunda (e o verificador mostra 1356.00 no lugar de 685.50).</p>")}
+
+<h2>3. Somar cada coluna: o total de cada forma de pagamento</h2>
+<p>Agora o laço de <b>fora</b> escolhe a coluna <code>j</code> e o de <b>dentro</b> passa por todas as linhas <code>i</code>:</p>
+${py(`for j in range(len(matriz[0])):      # quantas colunas: o tamanho da 1ª linha
+    soma_coluna = 0
+    for i in range(len(matriz)):     # quantas linhas
+        soma_coluna = soma_coluna + matriz[i][j]
+    totais.append(soma_coluna)`)}
+<p><code>len(matriz)</code> é o número de <b>linhas</b>; <code>len(matriz[0])</code> é o número de <b>colunas</b>.</p>
+
+<h2>4. Tabelas alinhadas com f-string</h2>
+<p>A planilha aparece alinhada porque o f-string reserva espaço: <code>{valor:&gt;10.2f}</code> = número com 2 casas, alinhado à <b>direita</b> em 10 espaços; <code>{texto:&lt;6}</code> = texto alinhado à <b>esquerda</b> em 6. Você vai estudar isso a fundo na Etapa 19.</p>`,
+    quiz: [
+      { p: "Na planilha da Teoria, quanto vale planilha[4][1]?", ops: ["620.00", "210.00", "505.50", "330.00"], certa: 0, expl: "Linha 4 (Sex), coluna 1 (PIX): 620.00." },
+      { p: "Para uma matriz de 5 linhas e 3 colunas, quanto vale len(matriz[0])?", ops: ["5", "3", "15", "0"], certa: 1, expl: "matriz[0] é a primeira linha, que tem 3 valores: o número de colunas." },
+      { p: "totais_das_colunas([[1, 2], [3, 4]]) devolve:", ops: ["[3, 7]", "[4, 6]", "[10]", "[1, 2, 3, 4]"], certa: 1, expl: "Coluna 0: 1 + 3 = 4. Coluna 1: 2 + 4 = 6." },
+    ],
+    pratica: [
+      passoAbrir(16),
+      {
+        titulo: "Encontre a parte ETAPA 16",
+        html: `${vscode({ etapa: 16, aberto: true, linhas: ["ETAPA 16:", linhaDe(16, "matriz[___][___]") + 2], realce: "lacunas" })}
+        <p>São 2 funções novas, com <b>5 lacunas</b> em 4 linhas. A planilha e a impressão da tabela já estão prontas no <code>main()</code>.</p>`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: totais das linhas",
+        html: `${py(`        soma_linha = ___
+        ...
+        totais.___(soma_linha)`)}
+        <p>Com quanto cada linha começa a soma? E qual comando acrescenta o total da linha no fim da lista <code>totais</code>?</p>`,
+      },
+      {
+        titulo: "Lacunas 3, 4 e 5: totais das colunas",
+        html: `${py(`        for i in range(len(___)):
+            soma_coluna = soma_coluna + matriz[___][___]`)}
+        <ul><li>O laço de dentro passa por todas as <b>linhas</b>: o tamanho de quê dá o número de linhas?</li><li>Na célula, primeiro a <b>linha</b>, depois a <b>coluna</b>. Quais variáveis guardam cada uma?</li></ul>
+        ${dica("Dica", "<p>Releia a parte 3 da Teoria. Faça à mão a coluna 0 da matriz [[1, 2], [3, 4]]: o resultado precisa ser 4.</p>")}`,
+      },
+      passoSalvar(),
+      passoRodar(16, caixa("pense", "Confira um total à mão", "<p>Some a linha da segunda-feira: 120 + 340,50 + 210 = 670,50. A coluna Total da linha Seg mostra isso?</p>")),
+      passoVerificar(16),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 17
+  E[17] = {
+    n: 17, semana: "Semana 17", tema: "Funções, escopo e revisão por pares",
+    titulo: "Funções e escopo",
+    resumo: "O caixa ganha o desconto VIP e a conferência do caixa, com funções sem efeito colateral.",
+    objetivos: ["Criar funções reutilizáveis com parâmetros e retorno.", "Explicar escopo local e global e evitar efeito colateral.", "Revisar o código de um colega com feedback assertivo."],
+    teoria: `
+<h2>1. Funções reutilizáveis</h2>
+<p>Uma boa função recebe <b>tudo</b> o que precisa pelos parâmetros e entrega o resultado pelo <code>return</code>. Assim, ela pode ser usada em qualquer lugar, com quaisquer valores:</p>
+${py(`def aplicar_desconto(valor, percentual):
+    return valor - valor * percentual / 100
+
+aplicar_desconto(200, 10)   # 180.0
+aplicar_desconto(80, 25)    # 60.0`)}
+
+<h2>2. Escopo: onde cada variável existe</h2>
+<table class="tab"><tr><th>Escopo</th><th>Onde é criada</th><th>Onde pode ser usada</th></tr>
+<tr><td><b>Local</b></td><td>Dentro de uma função</td><td>Só dentro dela; some quando a função termina.</td></tr>
+<tr><td><b>Global</b></td><td>Fora de qualquer função</td><td>Pode ser lida em todo o arquivo.</td></tr></table>
+<p>Veja o que acontece quando uma função tenta <b>mudar</b> uma variável global:</p>
+${py(`total_do_caixa = 0
+
+def registrar_venda(valor):
+    total_do_caixa = total_do_caixa + valor   # UnboundLocalError!`)}
+<p>Ao ver <code>total_do_caixa = ...</code> dentro da função, o Python entende que é uma variável <b>local nova</b>, e ela ainda não tem valor quando a conta é feita. Existe o comando <code>global</code> para “forçar”, mas ele cria <b>efeito colateral</b>: a função mexe escondido em algo de fora, e fica difícil saber quem mudou o quê. Neste projeto o verificador não aceita <code>global</code>.</p>
+
+<h2>3. A solução: receber e devolver</h2>
+${py(`def registrar_venda(total_atual, valor):
+    novo_total = total_atual + valor
+    return novo_total
+
+total_do_caixa = 0
+for valor in totais:
+    total_do_caixa = registrar_venda(total_do_caixa, valor)`)}
+<p>A função recebe o total atual, calcula e <b>devolve</b> o novo total. Quem chama decide onde guardar. Uma função assim, que só depende dos parâmetros, é fácil de <b>testar</b>: <code>registrar_venda(100, 42.5)</code> sempre devolve 142.5.</p>
+${caixa("info", "Procedimento ou função?", "<p>A função <b>devolve</b> um valor (<code>return</code>). O procedimento só <b>executa</b> uma ação, como mostrar algo na tela. O <code>main()</code> é um procedimento; <code>aplicar_desconto</code> é uma função.</p>")}
+
+<h2>4. Revisão por pares e feedback assertivo</h2>
+<p>Antes de um código ir para o sistema de verdade, um colega lê e avalia. Use este checklist:</p>
+<table class="tab"><tr><th>Critério</th></tr><tr><td>Cada função faz uma tarefa só e tem um nome que diz qual é.</td></tr><tr><td>Recebe os dados por parâmetro e devolve com return (sem global).</td></tr><tr><td>Não repete código que já existe em outra função (DRY).</td></tr></table>
+<p>O feedback <b>assertivo</b> é claro e respeitoso e sempre traz uma sugestão: <i>“Na linha 40 o 10 está escrito direto; o que acha de transformar em parâmetro?”</i> Evite: <i>“tá errado”</i> (vago) ou <i>“seu código é ruim”</i> (ataca a pessoa).</p>`,
+    quiz: [
+      { p: "Uma variável criada dentro de uma função é:", ops: ["Global", "Local", "Constante", "Parâmetro sempre"], certa: 1, expl: "Ela só existe dentro da função e some quando a função termina." },
+      { p: "O que é efeito colateral?", ops: ["Um erro de sintaxe", "Quando a função altera algo fora dela, escondido", "Quando a função devolve um valor", "Um teste automático"], certa: 1, expl: "Mudar variáveis de fora (por exemplo, com global) torna o programa difícil de entender e testar." },
+      { p: "Qual é um feedback assertivo?", ops: ["\"Isso está horrível.\"", "\"Não entendi nada.\"", "\"Na função X, o 100 aparece duas vezes; que tal criar uma variável para ele?\"", "\"Faz de novo.\""], certa: 2, expl: "É específico (onde), explica o problema e sugere uma melhoria, sem atacar a pessoa." },
+    ],
+    pratica: [
+      passoAbrir(17),
+      {
+        titulo: "Lacunas 1 e 2: as funções da etapa",
+        html: `${vscode({ etapa: 17, aberto: true, linhas: ["ETAPA 17:", linhaDe(17, "    return ___") + 1], realce: "lacunas" })}
+        ${py(`    return valor - valor * ___ / 100`)}<p>Qual parâmetro diz <b>quantos por cento</b> de desconto?</p>
+        ${py(`    novo_total = total_atual + valor
+    return ___`)}<p>O que a função deve <b>devolver</b>?</p>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: usando as funções no main",
+        html: `${vscode({ etapa: 17, aberto: true, linhas: [linhaDe(17, "total_do_caixa = 0"), linhaDe(17, "desconto VIP")], realce: "lacunas" })}
+        <ul><li><b>Lacuna 3:</b> a cada venda, <code>registrar_venda</code> recebe o total <b>atual</b> do caixa. Qual variável guarda esse total?</li>
+        <li><b>Lacuna 4:</b> o desconto VIP é de quantos por cento? (Leia o texto do print.)</li></ul>`,
+      },
+      passoSalvar(),
+      passoRodar(17, caixa("pense", "A conferência bate?", "<p>A linha <b>Conferência do caixa</b> deve mostrar o mesmo valor do <b>Total do dia</b>: são dois jeitos diferentes de chegar ao mesmo número.</p>")),
+      passoVerificar(17),
+      {
+        titulo: "Revisão por pares",
+        html: `<p>Com um colega que também terminou, troquem de computador e leiam as funções da Etapa 17 com o checklist da Teoria (parte 4). Cada um escreve <b>um elogio</b> e <b>uma sugestão</b>, apontando a linha e usando feedback assertivo. Use isso na reflexão da entrega.</p>`,
+      },
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 18
+  E[18] = {
+    n: 18, semana: "Semana 18", tema: "Depuração e testes: breakpoints, testes unitários e TDD",
+    titulo: "Testes e TDD",
+    resumo: "O projeto ganha o testes.py. A nova função faixa_da_venda nasce depois dos testes (TDD), e você escreve testes seus.",
+    objetivos: ["Escrever testes unitários com assert.", "Aplicar o ciclo do TDD: vermelho, verde, refatorar.", "Usar os testes para encontrar regressões."],
+    teoria: `
+<h2>1. Bug, depuração e os tipos de erro</h2>
+<p>Lembra da Etapa 6? Erros de <b>sintaxe</b> e de <b>execução</b> o Python mostra. O <b>erro de lógica</b> (o programa roda, mas a conta está errada) só aparece quando alguém <b>confere o resultado</b>. Depurar é investigar a causa: rodar de novo, olhar valores, achar a linha, corrigir.</p>
+${caixa("info", "O depurador do VS Code (se tiver a extensão Python)", "<p>Clique à esquerda do número de uma linha para criar um <b>breakpoint</b> (bolinha vermelha) e aperte <kbd>F5</kbd>: o programa pausa ali. Com <kbd>F10</kbd> ele anda uma linha por vez, e o painel <b>Variáveis</b> mostra o valor de cada uma. Se o seu computador não tiver a extensão, um <code>print</code> temporário com o valor da variável faz o mesmo papel.</p>")}
+
+<h2>2. Teste unitário com assert</h2>
+<p>Um <b>teste unitário</b> confere automaticamente se <b>uma</b> função devolve o resultado esperado para certos valores:</p>
+${py(`assert soma([10, 20, 30]) == 60      # passa em silêncio
+assert media([]) == 0                # passa em silêncio
+assert soma([1, 1]) == 3             # AssertionError: o teste falhou!`)}
+<p>O arquivo <code>testes.py</code> junta vários testes. Ele <b>importa</b> as funções do <code>papelaria.py</code> (como na Etapa 14) e, se todos passarem, mostra <b>Todos os testes passaram!</b>.</p>
+
+<h2>3. TDD: o teste vem antes do código</h2>
+<p>No <b>TDD</b> (desenvolvimento guiado por testes) primeiro se escreve o teste do que a função <b>deve</b> fazer, e só depois a função:</p>
+<table class="tab"><tr><th>Fase</th><th>O que acontece</th></tr>
+<tr><td style="color:#b91c1c"><b>Vermelho</b></td><td>O teste existe, mas a função ainda não (ou está incompleta): o teste falha.</td></tr>
+<tr><td style="color:#15803d"><b>Verde</b></td><td>Escreve-se o mínimo de código para o teste passar.</td></tr>
+<tr><td><b>Refatorar</b></td><td>Melhora-se o código (nomes, organização) e os testes continuam verdes.</td></tr></table>
+<p>Os testes da <code>faixa_da_venda</code> já estão no <code>testes.py</code>; a função está incompleta. Repare que eles testam os <b>limites</b>: 49,99, 50, 199,99 e 200, os valores em que um <code>&lt;</code> trocado por <code>&lt;=</code> aparece.</p>
+${compara(`Funcao faixa_da_venda(valor: real): caractere
+inicio
+   se valor < 50 entao
+      retorne "pequena"
+   senao se valor < 200 entao
+      retorne "média"
+   fimse
+   retorne "grande"
+FimFuncao`, `def faixa_da_venda(valor):
+    if valor < 50:
+        return "pequena"
+    elif valor < 200:
+        return "média"
+    return "grande"`)}
+
+<h2>4. Regressão</h2>
+<p>Uma <b>regressão</b> é um erro que aparece numa parte que funcionava, depois de uma mudança em outro lugar. Por isso os testes antigos <b>continuam</b> no <code>testes.py</code>: a cada mudança você roda todos e descobre na hora se quebrou algo.</p>`,
+    quiz: [
+      { p: "O que acontece quando um assert é verdadeiro?", ops: ["Mostra OK na tela", "Nada: o programa segue", "Para o programa", "Repete o teste"], certa: 1, expl: "assert verdadeiro passa em silêncio. Só o falso interrompe, com AssertionError." },
+      { p: "No TDD, a primeira coisa a escrever é:", ops: ["A função completa", "O teste", "O main", "A documentação"], certa: 1, expl: "Primeiro o teste (vermelho), depois o código mínimo (verde), depois a refatoração." },
+      { p: "Pela regra, faixa_da_venda(200) deve devolver:", ops: ["\"pequena\"", "\"média\"", "\"grande\"", "200"], certa: 2, expl: "\"média\" é só de 50 até MENOS de 200. Com exatamente 200 é \"grande\"." },
+    ],
+    pratica: [
+      passoAbrir(18),
+      {
+        titulo: "Abra o testes.py",
+        html: `<p>A pasta <b>etapa-18</b> agora tem o <code>testes.py</code>. Abra-o e leia: são os testes das etapas anteriores, os 4 testes do TDD da <code>faixa_da_venda</code> e 2 lacunas onde <b>você</b> vai escrever testes.</p>
+        ${vscode({ etapa: 18, arquivoSel: "testes.py", aberto: true, linhas: [linhaDe(18, "TDD:", "testes.py"), linhaDe(18, 'print("Todos', "testes.py")], realce: "lacunas", marcas: { arquivo: 1 } })}`,
+      },
+      {
+        titulo: "Lacunas 1 e 2, no testes.py: os seus testes",
+        html: `<p>Cada lacuna vira uma linha de teste, no formato:</p>
+        ${py(`assert nome_da_funcao(valores) == resultado_esperado`, true)}
+        <ol class="faca"><li>Escolha uma função do projeto (soma, media, posicao_de, faixa_da_venda...).</li><li>Escolha valores que <b>ainda não</b> foram testados.</li><li>Calcule <b>à mão</b> o resultado esperado e escreva depois do <code>==</code>.</li></ol>
+        ${dica("Ideias", "<ul><li>a faixa de um valor bem pequeno;</li><li>a média de dois números que você calcula de cabeça;</li><li>a busca de um valor na última posição.</li></ul>")}
+        ${caixa("atencao", "Sem recuo", "<p>As linhas de teste começam encostadas na esquerda, como as outras linhas <code>assert</code> do arquivo.</p>")}`,
+      },
+      {
+        titulo: "Lacunas 3 e 4, no papelaria.py: faça os testes ficarem verdes",
+        html: `${vscode({ etapa: 18, aberto: true, linhas: [linhaDe(18, "def faixa_da_venda"), linhaDe(18, "def faixa_da_venda") + 6], realce: "lacunas" })}
+        ${py(`    elif valor ___ 200:
+        return "média"
+    return ___`)}
+        <p>Releia a regra no comentário da função e os 4 testes do TDD. Qual comparador faz 199,99 ser “média”, mas 200 não? E o que sobra para devolver no final?</p>`,
+      },
+      passoSalvar(),
+      {
+        titulo: "Rode os testes (do vermelho ao verde)",
+        html: `${cmd("python etapa-18/testes.py")}
+        ${terminal(["$ python etapa-18/testes.py", "Todos os testes passaram!", "$"], "Verde! Se algum falhar, aparece AssertionError com o número da linha do assert.")}
+        ${dica("Apareceu AssertionError num teste SEU?", "<p>Ou o resultado que você calculou está errado, ou a função tem um bug. Refaça a conta à mão: os dois lados do <code>==</code> precisam ser iguais.</p>", "problema")}`,
+      },
+      passoRodar(18, "", 1),
+      passoVerificar(18),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 19
+  E[19] = {
+    n: 19, semana: "Semana 19", tema: "Manipulação de textos: fatiamento, métodos e f-strings",
+    titulo: "Registro do dia (textos)",
+    resumo: "As vendas chegam como linhas de texto bagunçadas, e o caixa arruma, recorta e formata os recibos.",
+    objetivos: ["Recortar textos com fatiamento [início:fim].", "Usar split, strip, title e upper para arrumar dados.", "Alinhar valores com f-strings."],
+    teoria: `
+<h2>1. Os dados agora vêm como texto</h2>
+<p>O sistema antigo da papelaria grava cada venda numa linha de texto, assim (repare na bagunça):</p>
+${py(`"  09:15 | ana souza   | 42.50  | pix"`, true)}
+<p>Para fazer contas, o caixa precisa <b>desmontar</b> cada linha em hora, cliente, total e pagamento, e arrumar cada parte. Esse trabalho se chama <b>parsing</b>.</p>
+
+<h2>2. Texto é sequência: índices e fatiamento</h2>
+<table class="tab"><tr><th>Código (hora = "09:15")</th><th>Resultado</th></tr>
+<tr><td><code>hora[0]</code></td><td>"0" (o primeiro caractere)</td></tr>
+<tr><td><code>hora[-1]</code></td><td>"5" (índice negativo conta do fim)</td></tr>
+<tr><td><code>hora[0:2]</code></td><td>"09": do 0 até ANTES do 2 (como o range)</td></tr>
+<tr><td><code>hora[3:5]</code></td><td>"15" (os minutos)</td></tr>
+<tr><td><code>int(hora[0:2])</code></td><td>9 (agora é número)</td></tr></table>
+
+<h2>3. Métodos que arrumam textos</h2>
+<table class="tab"><tr><th>Método</th><th>Exemplo</th><th>Resultado</th></tr>
+<tr><td><code>split("|")</code></td><td><code>"a|b|c".split("|")</code></td><td><code>["a", "b", "c"]</code> (uma lista)</td></tr>
+<tr><td><code>strip()</code></td><td><code>"  ana  ".strip()</code></td><td><code>"ana"</code> (tira os espaços das pontas)</td></tr>
+<tr><td><code>title()</code></td><td><code>"ana souza".title()</code></td><td><code>"Ana Souza"</code></td></tr>
+<tr><td><code>upper()</code></td><td><code>"pix".upper()</code></td><td><code>"PIX"</code></td></tr>
+<tr><td><code>replace(a, b)</code></td><td><code>"2,50".replace(",", ".")</code></td><td><code>"2.50"</code> (você usa desde a Etapa 1!)</td></tr></table>
+<p>Os métodos podem ser encadeados: <code>partes[1].strip().title()</code> primeiro tira os espaços, depois arruma as maiúsculas.</p>
+
+<h2>4. Desmontando uma linha, passo a passo</h2>
+<table class="tab"><tr><th>Passo</th><th>Resultado</th></tr>
+<tr><td><code>partes = linha.split("|")</code></td><td><code>["  09:15 ", " ana souza   ", " 42.50  ", " pix"]</code></td></tr>
+<tr><td><code>partes[0].strip()</code></td><td><code>"09:15"</code></td></tr>
+<tr><td><code>partes[1].strip().title()</code></td><td><code>"Ana Souza"</code></td></tr>
+<tr><td><code>float(partes[2].strip())</code></td><td><code>42.5</code></td></tr>
+<tr><td><code>partes[3].strip().upper()</code></td><td><code>"PIX"</code></td></tr></table>
+
+<h2>5. f-strings que alinham</h2>
+${py(`f"{cliente:<15}R$ {total:>8.2f}"
+# 'Ana            R$     5.00'`)}
+<p><code>:&lt;15</code> alinha o texto à <b>esquerda</b> num espaço de 15; <code>:&gt;8.2f</code> alinha o número à <b>direita</b> num espaço de 8, com 2 casas. É assim que os recibos ficam em colunas.</p>`,
+    quiz: [
+      { p: "Se hora = \"14:05\", quanto vale hora[0:2]?", ops: ["\"14\"", "\"14:\"", "\"4:\"", "14"], certa: 0, expl: "Do índice 0 até antes do 2: os caracteres 0 e 1, \"14\". Ainda é texto; int() transforma em número." },
+      { p: "\"a; b\".split(\";\") resulta em:", ops: ["[\"a\", \"b\"]", "[\"a\", \" b\"]", "\"a b\"", "[\"a;\", \"b\"]"], certa: 1, expl: "O split só corta no ponto e vírgula; o espaço continua no segundo pedaço. Para tirar, use strip()." },
+      { p: "\"  bruno LIMA \".strip().title() dá:", ops: ["\"BRUNO LIMA\"", "\"bruno lima\"", "\"Bruno Lima\"", "\"  Bruno Lima \""], certa: 2, expl: "strip tira os espaços das pontas e title deixa maiúscula só a primeira letra de cada palavra." },
+    ],
+    pratica: [
+      passoAbrir(19),
+      {
+        titulo: "Os dados mudaram",
+        html: `<p>O vetor <code>TOTAIS_DO_DIA</code> saiu. No lugar dele há o <code>REGISTRO_DO_DIA</code>, com as linhas bagunçadas, e o <code>main()</code> monta os totais a partir delas. São <b>5 lacunas</b> em 4 linhas, nas funções da Etapa 19.</p>
+        ${vscode({ etapa: 19, aberto: true, linhas: [linhaDe(19, "REGISTRO_DO_DIA = ["), linhaDe(19, "REGISTRO_DO_DIA = [") + 7] })}`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: desmontar e arrumar",
+        html: `${vscode({ etapa: 19, aberto: true, linhas: [linhaDe(19, "def ler_registro"), linhaDe(19, "return [hora, cliente, total, pagamento]")], realce: "lacunas" })}
+        <ul><li><b>Lacuna 1:</b> qual caractere separa as partes da linha? Escreva-o entre aspas.</li><li><b>Lacuna 2:</b> qual método deixa “ana souza” como “Ana Souza”? (Só o nome, sem os parênteses.)</li></ul>`,
+      },
+      {
+        titulo: `Lacunas 3 e 4 (linha ${linhaDe(19, "hora[___:___]")}): recortar as horas`,
+        html: `${py(`    return int(hora[___:___])`)}<p>Em <code>"09:15"</code>, as horas são os <b>2 primeiros</b> caracteres. Onde o fatiamento começa e onde termina (lembre que o fim fica de fora)?</p>`,
+      },
+      {
+        titulo: `Lacuna 5 (linha ${linhaDe(19, 'R$ {___:>8.2f}')}): o valor no recibo`,
+        html: `${py(`    return f"{cliente:<15}R$ {___:>8.2f}"`)}<p>Depois de “R$” vem o <b>valor</b> da venda. Qual parâmetro da função é esse valor?</p>`,
+      },
+      passoSalvar(),
+      {
+        titulo: "Rode os testes",
+        html: `${cmd("python etapa-19/testes.py")}<p>O <code>testes.py</code> ganhou testes das funções novas. Precisa aparecer <b>Todos os testes passaram!</b>.</p>`,
+      },
+      passoRodar(19, "", 1),
+      passoVerificar(19),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 20
+  E[20] = {
+    n: 20, semana: "Semana 20", tema: "Arquivos e planilhas: leitura, escrita e CSV",
+    titulo: "Arquivos e CSV",
+    resumo: "As vendas vêm de uma planilha CSV, e o caixa grava o resumo e o histórico em arquivos. Fim do Caixa v3!",
+    objetivos: ["Abrir arquivos com with open() e o encoding certo.", "Escolher entre os modos \"r\", \"w\" e \"a\".", "Ler uma planilha CSV pulando o cabeçalho."],
+    teoria: `
+<h2>1. Por que arquivos?</h2>
+<p>Tudo o que fica em variáveis e listas <b>some</b> quando o programa termina. Para guardar as vendas e os resumos de um dia para o outro, o programa precisa <b>ler e escrever arquivos</b> no disco.</p>
+
+<h2>2. with open(): abrir e fechar sozinho</h2>
+${py(`with open("resumo.txt", "w", encoding="utf-8") as arquivo:
+    arquivo.write("Total: R$ 544.90\\n")
+# aqui o arquivo já foi fechado automaticamente`)}
+<p>O <code>with</code> garante que o arquivo seja <b>fechado</b> no fim do bloco, mesmo se der erro. O <code>encoding="utf-8"</code> faz os acentos (Relatório, Média) saírem certos.</p>
+
+<h2>3. Os modos de abertura</h2>
+<table class="tab"><tr><th>Modo</th><th>Para</th><th>Se o arquivo já existe</th><th>No caixa</th></tr>
+<tr><td><code>"r"</code></td><td>ler</td><td>lê do começo</td><td>ler o <code>vendas.csv</code></td></tr>
+<tr><td><code>"w"</code></td><td>escrever</td><td><b>apaga tudo</b> e escreve de novo</td><td>o <code>resumo.txt</code> (sempre o do dia)</td></tr>
+<tr><td><code>"a"</code></td><td>acrescentar</td><td>escreve <b>no fim</b>, mantendo o que havia</td><td>o <code>historico.txt</code> (um registro por fechamento)</td></tr></table>
+${caixa("atencao", "write não pula linha", "<p><code>arquivo.write(\"a\")</code> seguido de <code>arquivo.write(\"b\")</code> grava <code>ab</code>. Para cada item ficar numa linha, acrescente <code>\"\\n\"</code> (quebra de linha) no fim.</p>")}
+
+<h2>4. CSV: uma planilha em texto</h2>
+<p>CSV é um arquivo de texto em que cada linha é uma linha da planilha e as colunas são separadas por vírgula. A primeira linha é o <b>cabeçalho</b>, com os nomes das colunas. O Excel e o LibreOffice abrem esse formato.</p>
+${py(`hora,cliente,total,pagamento
+09:15,ana souza,42.50,pix
+10:02,BRUNO LIMA,177.50,cartao`, true)}
+${py(`import csv
+with open(caminho, "r", encoding="utf-8", newline="") as arquivo:
+    leitor = csv.reader(arquivo)
+    next(leitor)                 # pula o cabeçalho
+    for linha in leitor:         # linha = ["09:15", "ana souza", "42.50", "pix"]
+        total = float(linha[2])`)}
+<p>O <code>next(leitor)</code> “consome” a primeira linha. Sem ele, o programa tentaria transformar a palavra <code>"total"</code> em número, e o resultado seria um <code>ValueError</code>.</p>
+
+<h2>5. Onde ficam os arquivos</h2>
+<p>A linha pronta <code>PASTA = os.path.dirname(os.path.abspath(__file__))</code> descobre a pasta onde o <code>papelaria.py</code> está. Assim o programa encontra o <code>vendas.csv</code> e cria o <code>resumo.txt</code> e o <code>historico.txt</code> <b>na pasta etapa-20</b>, não importa de onde você rodou o comando.</p>`,
+    quiz: [
+      { p: "Para guardar um histórico que cresce a cada fechamento, sem perder os anteriores, o modo é:", ops: ["\"r\"", "\"w\"", "\"a\"", "\"x\""], certa: 2, expl: "\"a\" (append) acrescenta no fim. \"w\" apagaria o histórico a cada vez." },
+      { p: "Para que serve o next(leitor) antes do for?", ops: ["Para fechar o arquivo", "Para pular o cabeçalho", "Para ler a última linha", "Para criar o arquivo"], certa: 1, expl: "A primeira linha do CSV tem os nomes das colunas, não é uma venda." },
+      { p: "O que o with garante?", ops: ["Que o arquivo exista", "Que o arquivo seja fechado no fim do bloco", "Que o arquivo seja CSV", "Que não haja acentos"], certa: 1, expl: "Ao sair do bloco with, o Python fecha o arquivo automaticamente." },
+    ],
+    pratica: [
+      passoAbrir(20),
+      {
+        titulo: "Abra o vendas.csv",
+        html: `<p>No EXPLORADOR, clique em <b>vendas.csv</b> <span class="marca">1</span>. São as mesmas vendas das etapas anteriores, agora numa planilha. <b>Não altere</b> este arquivo.</p>
+        ${vscode({ etapa: 20, arquivoSel: "vendas.csv", aberto: true, codigo: "hora,cliente,total,pagamento\n09:15,ana souza,42.50,pix\n10:02,BRUNO LIMA,177.50,cartao\n11:40,carla dias,15.00,dinheiro\n14:05,davi rocha,230.00,PIX\n15:30,Elisa Prado,64.90,cartao\n17:55,fabio nunes,15.00,dinheiro", linhas: [1, 7], marcas: { arquivo: 1 } })}`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: ler o CSV",
+        html: `${vscode({ etapa: 20, aberto: true, linhas: [linhaDe(20, "def ler_vendas"), linhaDe(20, "def ler_vendas") + 8], realce: "lacunas" })}
+        <ul><li><b>Lacuna 1:</b> o modo de abertura para <b>ler</b> (uma letra, entre as aspas que já estão lá).</li><li><b>Lacuna 2:</b> a função que pula a primeira linha do leitor.</li></ul>`,
+      },
+      {
+        titulo: "Lacunas 3, 4 e 5: escrever o resumo e o histórico",
+        html: `${vscode({ etapa: 20, aberto: true, linhas: [linhaDe(20, "def salvar_resumo"), linhaDe(20, "def registrar_historico") + 4], realce: "lacunas" })}
+        <ul><li><b>Lacuna 3:</b> o resumo é sempre recriado do zero. Qual modo apaga e escreve de novo?</li>
+        <li><b>Lacuna 4:</b> o que precisa ir no fim de cada linha para pular para a próxima? (Entre aspas.)</li>
+        <li><b>Lacuna 5:</b> o histórico <b>acrescenta</b> no fim. Qual modo?</li></ul>`,
+      },
+      passoSalvar(),
+      passoRodar(20),
+      {
+        titulo: "Veja os arquivos criados (e rode de novo)",
+        html: `<ol class="faca"><li>No EXPLORADOR, dentro de <b>etapa-20</b>, apareceram <b>resumo.txt</b> e <b>historico.txt</b>. Abra os dois.</li>
+        <li>Rode o programa <b>mais uma vez</b> e abra os arquivos de novo.</li></ol>
+        ${caixa("pense", "O que mudou?", "<p>O <code>resumo.txt</code> continua com 3 linhas (o modo <code>\"w\"</code> apagou e escreveu de novo). O <code>historico.txt</code> ganhou uma linha a mais (o modo <code>\"a\"</code> acrescentou). Essa é a diferença entre os dois modos, na prática.</p>")}`,
+      },
+      passoVerificar(20),
+    ],
+    fim: caixa("ok", "🎉 Você construiu o Caixa v3 da Papelaria Ponto Certo!", "<p>O fechamento do dia lê uma planilha CSV, arruma os dados, calcula estatísticas, monta a planilha da semana, tem testes automáticos e grava os resultados em arquivos. No 4º bimestre, a Papelaria ganha um <b>sistema com menu</b>, cadastro de produtos e muito mais.</p>"),
   };
 
   return E;

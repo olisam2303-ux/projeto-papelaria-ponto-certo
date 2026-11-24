@@ -1,0 +1,82 @@
+SAÍDA ESPERADA - ETAPA 18: Testes e TDD
+================================================================
+Para comparar: rode  python etapa-18/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - os testes do testes.py passam -------------------
+Comando: python etapa-18/testes.py  (não digita nada)
+
+Todos os testes passaram!
+
+---- Teste 2 - relatório do dia (o programa inteiro) -----------
+Valores digitados: (nenhum: o programa não faz perguntas)
+
+=== PAPELARIA PONTO CERTO - FECHAMENTO DO DIA ===
+Vendas do dia: 6
+Total do dia: R$ 544.90
+Média por venda: R$ 90.82
+Vendas acima da média: 2
+A primeira venda de R$ 15,00 foi a de número 3
+Nenhuma venda de R$ 999,00 hoje.
+Vendas pequenas: 3 | médias: 2 | grandes: 1
+Conferência do caixa: R$ 544.90
+Média com o desconto VIP de 10%: R$ 81.73
+PLANILHA DA SEMANA (R$)
+Dia     Dinheiro       PIX    Cartão     Total
+Seg       120.00    340.50    210.00    670.50
+Ter        95.00    410.00    180.50    685.50
+Qua       150.50    290.00    260.00    700.50
+Qui        80.00    505.50    199.90    785.40
+Sex       210.00    620.00    330.00   1160.00
+Total     655.50   2166.00   1180.40   4001.90
+
+---- Teste 3 - faixa de 49,99 ----------------------------------
+Chamada: faixa_da_venda(49.99)
+
+Resultado esperado: 'pequena'
+
+---- Teste 4 - faixa de 50 (limite) ----------------------------
+Chamada: faixa_da_venda(50)
+
+Resultado esperado: 'média'
+
+---- Teste 5 - faixa de 199,99 ---------------------------------
+Chamada: faixa_da_venda(199.99)
+
+Resultado esperado: 'média'
+
+---- Teste 6 - faixa de 200 (limite) ---------------------------
+Chamada: faixa_da_venda(200)
+
+Resultado esperado: 'grande'
+
+---- Teste 7 - desconto de 10% em 200 --------------------------
+Chamada: aplicar_desconto(200, 10)
+
+Resultado esperado: 180.0
+
+---- Teste 8 - desconto de 0% em 50 ----------------------------
+Chamada: aplicar_desconto(50, 0)
+
+Resultado esperado: 50.0
+
+---- Teste 9 - soma de [10, 20, 30] ----------------------------
+Chamada: soma([10, 20, 30])
+
+Resultado esperado: 60
+
+---- Teste 10 - soma de um vetor vazio -------------------------
+Chamada: soma([])
+
+Resultado esperado: 0
+
+---- Teste 11 - média de [10, 20] ------------------------------
+Chamada: media([10, 20])
+
+Resultado esperado: 15.0
+
+---- Teste 12 - média de um vetor vazio ------------------------
+Chamada: media([])
+
+Resultado esperado: 0

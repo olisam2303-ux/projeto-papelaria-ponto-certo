@@ -1,0 +1,99 @@
+SAÍDA ESPERADA - ETAPA 19: Registro do dia (textos)
+================================================================
+Para comparar: rode  python etapa-19/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - os testes do testes.py passam -------------------
+Comando: python etapa-19/testes.py  (não digita nada)
+
+Todos os testes passaram!
+
+---- Teste 2 - relatório do dia (o programa inteiro) -----------
+Valores digitados: (nenhum: o programa não faz perguntas)
+
+=== PAPELARIA PONTO CERTO - FECHAMENTO DO DIA ===
+Vendas do dia: 6
+Total do dia: R$ 544.90
+Média por venda: R$ 90.82
+Vendas acima da média: 2
+A primeira venda de R$ 15,00 foi a de número 3
+Nenhuma venda de R$ 999,00 hoje.
+Vendas pequenas: 3 | médias: 2 | grandes: 1
+Conferência do caixa: R$ 544.90
+Média com o desconto VIP de 10%: R$ 81.73
+RECIBOS DO DIA
+09:15  Ana Souza      R$    42.50  PIX
+10:02  Bruno Lima     R$   177.50  CARTAO
+11:40  Carla Dias     R$    15.00  DINHEIRO
+14:05  Davi Rocha     R$   230.00  PIX
+15:30  Elisa Prado    R$    64.90  CARTAO
+17:55  Fabio Nunes    R$    15.00  DINHEIRO
+Total em DINHEIRO: R$ 30.00
+Total em PIX: R$ 272.50
+Total em CARTAO: R$ 242.40
+Vendas de manhã (antes das 12h): 3
+Vendas à tarde: 3
+PLANILHA DA SEMANA (R$)
+Dia     Dinheiro       PIX    Cartão     Total
+Seg       120.00    340.50    210.00    670.50
+Ter        95.00    410.00    180.50    685.50
+Qua       150.50    290.00    260.00    700.50
+Qui        80.00    505.50    199.90    785.40
+Sex       210.00    620.00    330.00   1160.00
+Total     655.50   2166.00   1180.40   4001.90
+
+---- Teste 3 - ler um registro bagunçado -----------------------
+Chamada: ler_registro('  09:15 | ana souza   | 42.50  | pix')
+
+Resultado esperado: ['09:15', 'Ana Souza', 42.5, 'PIX']
+
+---- Teste 4 - ler um registro sem espaços ---------------------
+Chamada: ler_registro('10:02|BRUNO LIMA|177.50|cartao')
+
+Resultado esperado: ['10:02', 'Bruno Lima', 177.5, 'CARTAO']
+
+---- Teste 5 - hora cheia de 09:15 -----------------------------
+Chamada: hora_cheia('09:15')
+
+Resultado esperado: 9
+
+---- Teste 6 - hora cheia de 14:05 -----------------------------
+Chamada: hora_cheia('14:05')
+
+Resultado esperado: 14
+
+---- Teste 7 - linha do recibo da Ana --------------------------
+Chamada: linha_do_recibo('Ana', 5)
+
+Resultado esperado: 'Ana            R$     5.00'
+
+---- Teste 8 - faixa de 49,99 ----------------------------------
+Chamada: faixa_da_venda(49.99)
+
+Resultado esperado: 'pequena'
+
+---- Teste 9 - faixa de 50 (limite) ----------------------------
+Chamada: faixa_da_venda(50)
+
+Resultado esperado: 'média'
+
+---- Teste 10 - soma de [10, 20, 30] ---------------------------
+Chamada: soma([10, 20, 30])
+
+Resultado esperado: 60
+
+---- Teste 11 - soma de um vetor vazio -------------------------
+Chamada: soma([])
+
+Resultado esperado: 0
+
+---- Teste 12 - média de [10, 20] ------------------------------
+Chamada: media([10, 20])
+
+Resultado esperado: 15.0
+
+---- Teste 13 - média de um vetor vazio ------------------------
+Chamada: media([])
+
+Resultado esperado: 0

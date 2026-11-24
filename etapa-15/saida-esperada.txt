@@ -1,0 +1,56 @@
+SAÍDA ESPERADA - ETAPA 15: Estatísticas do dia (vetores)
+================================================================
+Para comparar: rode  python etapa-15/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - relatório do dia (o programa inteiro) -----------
+Valores digitados: (nenhum: o programa não faz perguntas)
+
+=== PAPELARIA PONTO CERTO - FECHAMENTO DO DIA ===
+Vendas do dia: 6
+Total do dia: R$ 544.90
+Média por venda: R$ 90.82
+Vendas acima da média: 2
+A primeira venda de R$ 15,00 foi a de número 3
+Nenhuma venda de R$ 999,00 hoje.
+
+---- Teste 2 - soma de [10, 20, 30] ----------------------------
+Chamada: soma([10, 20, 30])
+
+Resultado esperado: 60
+
+---- Teste 3 - soma de um vetor vazio --------------------------
+Chamada: soma([])
+
+Resultado esperado: 0
+
+---- Teste 4 - média de [10, 20] -------------------------------
+Chamada: media([10, 20])
+
+Resultado esperado: 15.0
+
+---- Teste 5 - média de um vetor vazio -------------------------
+Chamada: media([])
+
+Resultado esperado: 0
+
+---- Teste 6 - busca de um valor repetido (devolve a 1ª posição) 
+Chamada: posicao_de([5, 8, 8], 8)
+
+Resultado esperado: 1
+
+---- Teste 7 - busca de um valor que não existe ----------------
+Chamada: posicao_de([5, 8], 9)
+
+Resultado esperado: -1
+
+---- Teste 8 - busca num vetor vazio ---------------------------
+Chamada: posicao_de([], 1)
+
+Resultado esperado: -1
+
+---- Teste 9 - quantos acima de 4 em [1, 5, 10] ----------------
+Chamada: quantos_acima([1, 5, 10], 4)
+
+Resultado esperado: 2

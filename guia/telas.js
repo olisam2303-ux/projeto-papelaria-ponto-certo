@@ -94,10 +94,11 @@
       itens.push(pasta(nome, aberta, aberta ? op.marcas.pasta : null));
       if (aberta) {
         const doKit = window.KIT && window.KIT[n] && window.KIT[n].arquivos ? window.KIT[n].arquivos.map((x) => x.nome) : [n === 0 ? "ola.py" : "papelaria.py"];
-        const arqs = [...doKit, "saida-esperada.txt", "verificar.py"].sort((x, y) => x.localeCompare(y));
+        const dadosKit = window.KIT && window.KIT[n] && window.KIT[n].dados ? window.KIT[n].dados : [];
+        const arqs = [...doKit, ...dadosKit, "saida-esperada.txt", "verificar.py"].sort((x, y) => x.localeCompare(y));
         for (const a of arqs) {
           const sel = op.arquivoSel === a;
-          const ic = a.endsWith(".py") ? '<span class="ic py">py</span>' : '<span class="ic txt">≡</span>';
+          const ic = a.endsWith(".py") ? '<span class="ic py">py</span>' : a.endsWith(".csv") ? '<span class="ic" style="color:#89d185">▦</span>' : '<span class="ic txt">≡</span>';
           itens.push(`<div class="vsc-item${sel ? " sel" : ""}" style="padding-left:34px">${ic}${esc(a)}${sel ? marca(op.marcas.arquivo) : ""}</div>`);
         }
       }
