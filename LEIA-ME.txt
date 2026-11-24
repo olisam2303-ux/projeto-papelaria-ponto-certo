@@ -9,6 +9,8 @@ COMO COMEÇAR
 
 O QUE TEM AQUI
   index.html        o guia do projeto (teoria, prática e entrega)
+  Apostila_Guia_Papelaria_Ponto_Certo_1bim.pdf
+                    o mesmo conteúdo do guia, em PDF, para ler ou imprimir
   guia/             arquivos do guia (não mexa)
   etapa-00 a 07/    uma pasta por etapa, cada uma com:
       papelaria.py        o programa que VOCÊ completa (na etapa 0: ola.py)

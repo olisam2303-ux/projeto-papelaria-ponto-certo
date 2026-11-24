@@ -294,6 +294,8 @@ details.saida pre { margin: 0 14px 14px; }
 .win-menu { position: relative; display: inline-block; margin: 10px 0 0 60px; background: #f9f9f9; border: 1px solid #d6d6d6; border-radius: 8px; padding: 4px; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 .win-menu div { padding: 5px 30px 5px 12px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
 .win-menu div.sel { background: #e5f1fb; }
+.win-lista div.win-menu { display: block; width: max-content; padding: 4px; margin: 6px 0 0 60px; }
+.win-lista .win-menu div { padding: 5px 30px 5px 12px; }
 
 /* ---------- ajuda ---------- */
 .problemas details { background: #fff; border: 1px solid var(--linha); border-radius: 10px; margin: 10px 0; padding: 10px 16px; }
