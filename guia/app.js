@@ -93,7 +93,7 @@
       <div><b>📄 Entregar</b>Colar o código no guia e gerar o comprovante em PDF para entregar ao professor.</div>
     </div>
     ${T.caixa("info", "Funciona sem internet", "<p>Este guia, os programas e os verificadores ficam todos na pasta <b>papelaria-ponto-certo</b>. Depois de copiar a pasta para o computador, nada precisa de internet. Só é preciso ter o <b>VS Code</b> e o <b>Python</b> instalados.</p>" +
-      (location.protocol === "file:" ? "" : `<p><a class="botao" href="papelaria-ponto-certo.zip" download>⬇ Baixar a pasta do projeto (.zip)</a> <span class="pequeno">Baixe uma vez só (ou pegue no pen drive do professor) e siga a Etapa 0.</span></p>`))}
+      (location.protocol === "file:" ? "" : `<p><a class="botao" href="Instalar_Papelaria_Ponto_Certo.exe" download>⬇ Instalador para Windows (.exe)</a> <a class="botao sec" href="papelaria-ponto-certo.zip" download>⬇ Pasta do projeto (.zip)</a></p><p class="pequeno">Baixe uma vez só (ou pegue no pen drive do professor) e siga a Etapa 0. O instalador copia tudo para Documentos e cria um atalho do guia; o .zip é a alternativa se o computador bloquear programas.</p>`))}
 
     <h2>As etapas</h2>
     <div class="mapa">${ETAPAS.map((e) => `<a class="etapa-card" href="#etapa-${e.n}">${statusDe(e.n)}<div class="num">Etapa ${e.n} · ${e.semana}</div><h3>${esc(e.titulo)}</h3><p>${e.resumo}</p></a>`).join("")}</div>

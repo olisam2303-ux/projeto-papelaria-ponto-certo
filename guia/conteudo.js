@@ -192,10 +192,12 @@ ${caixa("atencao", "Guarde o seu trabalho", "<p>Em muitos computadores de escola
     pratica: [
       {
         titulo: "Pegue a pasta do projeto",
-        html: `<p>O professor vai indicar <b>uma</b> destas formas (as duas funcionam sem internet depois):</p>
+        html: `<p>O professor vai indicar <b>uma</b> destas formas (todas funcionam sem internet depois):</p>
         <table class="tab"><tr><th>Como você recebe</th><th>O que fazer</th></tr>
+        <tr><td><b>Instalador</b> <code>Instalar_Papelaria_Ponto_Certo.exe</code> (do site ou do pen drive)</td><td>Dê dois cliques nele, confira a pasta (o normal é <b>Documentos</b>) e clique em <b>Instalar</b>. No fim ele oferece abrir o guia e deixa um atalho na Área de Trabalho. Se você já tinha o projeto, ele só atualiza e <b>mantém os seus programas</b>.</td></tr>
         <tr><td><b>Arquivo .zip</b> (baixado do site uma vez, ou copiado do pen drive)</td><td>Copie o <code>papelaria-ponto-certo.zip</code> para <b>Documentos</b>, clique com o botão direito nele e escolha <b>Extrair Tudo...</b> e depois <b>Extrair</b>.</td></tr>
         <tr><td><b>Pasta pronta</b> (pen drive ou pasta da rede)</td><td>Copie a pasta <code>papelaria-ponto-certo</code> inteira para <b>Documentos</b>.</td></tr></table>
+        ${dica("Apareceu “O Windows protegeu o computador” ao abrir o instalador?", "<p>É um aviso do Windows para programas baixados que não são de uma empresa conhecida. Se foi o professor que indicou o instalador, clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>. Se o computador da escola <b>bloquear</b> o instalador, use o arquivo <b>.zip</b> (linha de baixo da tabela).</p>")}
         ${window.T.extrair()}
         ${caixa("atencao", "Confira antes de seguir", "<p>Abrindo a pasta <b>papelaria-ponto-certo</b> no Windows, você deve ver as pastas <code>etapa-00</code> a <code>etapa-07</code>, a pasta <code>guia</code> e os arquivos <code>index.html</code> e <code>LEIA-ME.txt</code>. Se aparecer <b>outra</b> pasta papelaria-ponto-certo dentro dela, é essa de dentro que você vai usar.</p>")}`,
       },
