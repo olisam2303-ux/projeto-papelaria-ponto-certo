@@ -1,0 +1,300 @@
+SAÍDA ESPERADA - ETAPA 25: Sistema completo (vendas e arquivos)
+================================================================
+Para comparar: rode  python etapa-25/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - cadastrar, fechar e abrir de novo (os dados ficam salvos) 
+Valores digitados: 1 / Régua / 3,50 / 0  ||  (abriu de novo) 3 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Régua
+Preço (R$): 3,50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+--- (o programa foi fechado e aberto de novo) ---
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 3
+1. Caderno: R$ 18.50
+2. Caneta: R$ 4.50
+3. Mochila: R$ 120.00
+4. Borracha: R$ 2.00
+5. Régua: R$ 3.50
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+
+---- Teste 2 - alterar preço, vender e ver o desempenho --------
+Valores digitados: 7 / Caneta / 5 / 8 / caneta / 20 / 4 / Caneta / 2 / caneta / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 7
+Produto a alterar: Caneta
+Novo preço (R$): 5
+Preço alterado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 8
+Produto vendido: caneta
+Quantidade: 20
+Venda registrada!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 4
+Nome do produto: Caneta
+Caneta: média de 15.7 unidades por venda - giro Médio
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: caneta
+Caneta: R$ 5.00
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+
+---- Teste 3 - produto inexistente na venda e na alteração -----
+Valores digitados: 8 / Grampeador / 7 / Grampeador / 9 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 8
+Produto vendido: Grampeador
+Produto não cadastrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 7
+Produto a alterar: Grampeador
+Produto não encontrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 9
+Opção inválida.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+
+---- Teste 4 - vender, fechar e ver o ranking ------------------
+Valores digitados: 8 / Mochila / 40 / 0  ||  (abriu de novo) 5 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 8
+Produto vendido: Mochila
+Quantidade: 40
+Venda registrada!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+--- (o programa foi fechado e aberto de novo) ---
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 5
+1º Caderno - média 36.0 - giro Alto
+2º Mochila - média 21.5 - giro Médio
+3º Caneta - média 13.5 - giro Médio
+4º Borracha - média 0.0 - giro Sem histórico
+Ranking salvo em ranking.txt.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+7 - Alterar preço
+8 - Registrar venda
+0 - Sair
+Escolha uma opção: 0
+Dados salvos.
+Até logo!
+
+---- Teste 5 - carregar produtos de um CSV ---------------------
+Chamada: carregar_produtos(arquivo_teste('nome,preco\nLápis,1.5\nRégua,3\n'))
+
+Resultado esperado: [['Lápis', 1.5], ['Régua', 3.0]]
+
+---- Teste 6 - carregar quando o arquivo não existe ------------
+Chamada: carregar_produtos(caminho_teste())
+
+Resultado esperado: [['Caderno', 18.5], ['Caneta', 4.5], ['Mochila', 120.0], ['Borracha', 2.0]]
+
+---- Teste 7 - salvar produtos (o arquivo é recriado) ----------
+Chamada: ler_texto(c)
+
+Resultado esperado: 'nome,preco\nRégua,3.5\n'
+
+---- Teste 8 - giro com média 30 (limite) ----------------------
+Chamada: classificar_desempenho(30)
+
+Resultado esperado: 'Alto'
+
+---- Teste 9 - giro com média 29,9 -----------------------------
+Chamada: classificar_desempenho(29.9)
+
+Resultado esperado: 'Médio'
+
+---- Teste 10 - giro com média 10 (limite) ---------------------
+Chamada: classificar_desempenho(10)
+
+Resultado esperado: 'Médio'

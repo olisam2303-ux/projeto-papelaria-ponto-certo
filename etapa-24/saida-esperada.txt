@@ -1,0 +1,128 @@
+SAÍDA ESPERADA - ETAPA 24: Quiz de treinamento (tentativas e pontuação)
+================================================================
+Para comparar: rode  python etapa-24/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - acertou tudo de primeira ------------------------
+Valores digitados: 6 / 200 / PONTO10 / 0 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 6
+A partir de quantos reais o frete é grátis? 200
+Certo!
+Qual cupom dá R$ 10,00 de desconto? PONTO10
+Certo!
+Qual opção do menu sai do sistema? 0
+Certo!
+Pontuação: 3 de 3
+Excelente! Pronto para o caixa.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 2 - acertou na 3ª tentativa, errou uma e acertou outra 
+Valores digitados: 6 / 100 / 150 / 200 / x / y / z / 0 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 6
+A partir de quantos reais o frete é grátis? 100
+Errado.
+A partir de quantos reais o frete é grátis? 150
+Errado.
+A partir de quantos reais o frete é grátis? 200
+Certo!
+Qual cupom dá R$ 10,00 de desconto? x
+Errado.
+Qual cupom dá R$ 10,00 de desconto? y
+Errado.
+Qual cupom dá R$ 10,00 de desconto? z
+Errado.
+A resposta era: ponto10
+Qual opção do menu sai do sistema? 0
+Certo!
+Pontuação: 2 de 3
+Bom! Revise o que errou.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 3 - errou tudo --------------------------------------
+Valores digitados: 6 / a / b / c / d / e / f / g / h / i / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 6
+A partir de quantos reais o frete é grátis? a
+Errado.
+A partir de quantos reais o frete é grátis? b
+Errado.
+A partir de quantos reais o frete é grátis? c
+Errado.
+A resposta era: 200
+Qual cupom dá R$ 10,00 de desconto? d
+Errado.
+Qual cupom dá R$ 10,00 de desconto? e
+Errado.
+Qual cupom dá R$ 10,00 de desconto? f
+Errado.
+A resposta era: ponto10
+Qual opção do menu sai do sistema? g
+Errado.
+Qual opção do menu sai do sistema? h
+Errado.
+Qual opção do menu sai do sistema? i
+Errado.
+A resposta era: 0
+Pontuação: 0 de 3
+Estude mais e tente de novo.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+4 - Desempenho de um produto
+5 - Ranking de vendas
+6 - Quiz de treinamento
+0 - Sair
+Escolha uma opção: 0
+Até logo!

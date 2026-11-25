@@ -1,0 +1,124 @@
+SAÍDA ESPERADA - ETAPA 22: Cadastro em memória (validações e listagem)
+================================================================
+Para comparar: rode  python etapa-22/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - listar vazio, cadastrar dois e listar -----------
+Valores digitados: 3 / 1 / Caneta / 4.50 / 1 / Caderno / 18,50 / 3 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 3
+Nenhum produto cadastrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Caneta
+Preço (R$): 4.50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Caderno
+Preço (R$): 18,50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 3
+1. Caneta: R$ 4.50
+2. Caderno: R$ 18.50
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 2 - nome vazio, repetido e consulta com maiúsculas --
+Valores digitados: 1 / (só Enter) / 1 / Caneta / 4.50 / 1 / caneta / 2 / CANETA / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: 
+O nome não pode ficar vazio.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Caneta
+Preço (R$): 4.50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: caneta
+Produto já cadastrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: CANETA
+Caneta: R$ 4.50
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 3 - consulta de produto que não existe --------------
+Valores digitados: 2 / Grampeador / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: Grampeador
+Produto não encontrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+3 - Listar produtos
+0 - Sair
+Escolha uma opção: 0
+Até logo!

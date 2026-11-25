@@ -1,0 +1,102 @@
+SAÍDA ESPERADA - ETAPA 21: Menu, cadastro e consulta
+================================================================
+Para comparar: rode  python etapa-21/papelaria.py  e digite os mesmos
+valores de um dos testes abaixo. O seu terminal deve ficar IGUAL.
+(Nos testes do verificador, maiúsculas e acentos não fazem diferença.)
+
+---- Teste 1 - cadastrar e consultar ---------------------------
+Valores digitados: 1 / Caneta / 4,50 / 2 / Caneta / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Caneta
+Preço (R$): 4,50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: Caneta
+Caneta: R$ 4.50
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 2 - produto inexistente e opção inválida ------------
+Valores digitados: 2 / Grampeador / 9 / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: Grampeador
+Produto não encontrado.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 9
+Opção inválida.
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 3 - preço inválido é pedido de novo -----------------
+Valores digitados: 1 / Régua / 0 / -2 / 3.50 / 2 / Régua / 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 1
+Nome do produto: Régua
+Preço (R$): 0
+O preço precisa ser maior que zero.
+Preço (R$): -2
+O preço precisa ser maior que zero.
+Preço (R$): 3.50
+Produto cadastrado!
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 2
+Nome do produto: Régua
+Régua: R$ 3.50
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 0
+Até logo!
+
+---- Teste 4 - sair direto -------------------------------------
+Valores digitados: 0
+
+
+=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção: 0
+Até logo!

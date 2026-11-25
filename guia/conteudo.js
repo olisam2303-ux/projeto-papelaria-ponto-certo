@@ -1,4 +1,4 @@
-// Conteúdo das etapas (1º, 2º e 3º bimestres): TEORIA (separada) + PRÁTICA passo a passo.
+// Conteúdo das etapas (1º ao 4º bimestre): TEORIA (separada) + PRÁTICA passo a passo.
 // Os códigos mostrados vêm de dados-gerados.js (gerado pelo build a partir dos arquivos reais do kit).
 window.montarGuia = function () {
   const { py, compara, caixa, dica, cmd, vscode, terminal, linhaDe, esc } = window.T;
@@ -12,7 +12,7 @@ window.montarGuia = function () {
     for (let i = 1; i < partes.length; i += 3) {
       const corpo = partes[i + 2].replace(/^\n/, "").split("\n");
       const comando = corpo[0].startsWith("Comando:") || corpo[0].startsWith("Chamada:") || corpo[0].includes("(nenhum");
-      const ent = comando ? [] : corpo[0].replace("Valores digitados: ", "").split(" / ").map((x) => (x === "(só Enter)" ? "" : x));
+      const ent = comando ? [] : corpo[0].replace("Valores digitados: ", "").split("  ||  (abriu de novo) ").join(" / ").split(" / ").map((x) => (x === "(só Enter)" ? "" : x));
       const linhas = corpo.slice(2).filter((l, j, arr) => !(j === arr.length - 1 && l === ""));
       while (linhas.length && linhas[linhas.length - 1] === "") linhas.pop();
       lista.push({ num: Number(partes[i]), nome: partes[i + 1], entradas: ent, linhas, funcao: corpo[0].startsWith("Chamada:") });
@@ -1848,6 +1848,469 @@ with open(caminho, "r", encoding="utf-8", newline="") as arquivo:
       passoVerificar(20),
     ],
     fim: caixa("ok", "🎉 Você construiu o Caixa v3 da Papelaria Ponto Certo!", "<p>O fechamento do dia lê uma planilha CSV, arruma os dados, calcula estatísticas, monta a planilha da semana, tem testes automáticos e grava os resultados em arquivos. No 4º bimestre, a Papelaria ganha um <b>sistema com menu</b>, cadastro de produtos e muito mais.</p>"),
+  };
+
+  // =====================================================================
+  // 4º BIMESTRE · O SISTEMA DA PAPELARIA
+  // =====================================================================
+
+  // ---------------------------------------------------------------- ETAPA 21
+  E[21] = {
+    n: 21, semana: "Semana 21", tema: "Programando com menu no terminal",
+    titulo: "Menu, cadastro e consulta",
+    resumo: "Nasce o Sistema da papelaria: um menu que repete, com cadastro e consulta de produtos.",
+    objetivos: ["Organizar um programa em torno de um menu que repete com while.", "Usar if/elif/else para desviar para a função de cada opção.", "Validar entradas (opção inválida e preço maior que zero)."],
+    teoria: `
+<h2>1. Programas com menu</h2>
+<p>Caixas eletrônicos, máquinas de autoatendimento, sistemas de loja: todos mostram um <b>menu</b>, esperam uma escolha, executam e voltam ao menu. É o modelo <b>entrada → decisão → saída</b>, repetido até a pessoa escolher sair.</p>
+${py(`=== PAPELARIA PONTO CERTO - SISTEMA ===
+1 - Cadastrar produto
+2 - Consultar produto
+0 - Sair
+Escolha uma opção:`, true)}
+
+<h2>2. A estrutura do menu</h2>
+${compara(`opcao <- ""
+enquanto opcao <> "0" faca
+   mostrar_menu()
+   leia(opcao)
+   se opcao = "1" entao
+      cadastrar_produto()
+   senao se opcao = "2" entao
+      consultar_produto()
+   senao se opcao = "0" entao
+      escreva("Até logo!")
+   senao
+      escreva("Opção inválida.")
+   fimse
+fimenquanto`, `opcao = ""
+while opcao != "0":
+    mostrar_menu()
+    opcao = input("Escolha uma opção: ")
+    if opcao == "1":
+        cadastrar_produto(produtos)
+    elif opcao == "2":
+        consultar_produto(produtos)
+    elif opcao == "0":
+        print("Até logo!")
+    else:
+        print("Opção inválida.")`)}
+<table class="tab"><tr><th>Peça</th><th>Papel</th></tr>
+<tr><td><code>while opcao != "0"</code></td><td>Repete o menu até a pessoa escolher sair.</td></tr>
+<tr><td><code>if / elif / else</code></td><td>Desvia para a função da opção escolhida. O <code>else</code> pega qualquer opção que não existe.</td></tr>
+<tr><td>Funções</td><td>Cada opção é uma função. O menu só <b>coordena</b>; quem trabalha são as funções.</td></tr></table>
+${caixa("info", "A opção é texto", "<p>O <code>input</code> devolve texto. Por isso comparamos com <code>\"1\"</code>, entre aspas. Assim, se a pessoa digitar uma letra, o programa não quebra: cai no <b>Opção inválida</b>.</p>")}
+
+<h2>3. Os produtos: uma lista de listas</h2>
+<p>Cada produto é uma lista <code>[nome, preço]</code>, e o catálogo é uma lista desses produtos, igual a uma matriz em que cada linha é um produto:</p>
+${py(`produtos = [["Caneta", 4.5], ["Caderno", 18.5]]
+produtos[1][0]   # "Caderno"  (linha 1, coluna 0 = nome)
+produtos[1][1]   # 18.5       (linha 1, coluna 1 = preço)
+produtos.append(["Régua", 3.5])   # cadastra mais um`)}
+
+<h2>4. Validar entradas</h2>
+<p>Um preço zero ou negativo não faz sentido. A função <code>ler_preco</code> pergunta de novo <b>enquanto</b> o valor for inválido:</p>
+${py(`preco = float(input("Preço (R$): "))
+while preco <= 0:
+    print("O preço precisa ser maior que zero.")
+    preco = float(input("Preço (R$): "))`)}
+
+<h2>5. Consultar: busca com while</h2>
+<p>A consulta percorre o catálogo até achar o nome ou acabar a lista, como a busca linear da Etapa 15. A variável <code>encontrado</code> começa <code>False</code> e vira <code>True</code> quando acha.</p>`,
+    quiz: [
+      { p: "O que acontece se a pessoa digitar 9 no menu?", ops: ["O programa fecha", "Cai no else: Opção inválida", "Dá erro", "Cadastra um produto"], certa: 1, expl: "Nenhum if/elif é verdadeiro, então o else mostra \"Opção inválida.\" e o menu aparece de novo." },
+      { p: "Com produtos = [[\"Caneta\", 4.5]], quanto vale produtos[0][1]?", ops: ["\"Caneta\"", "4.5", "0", "Dá erro"], certa: 1, expl: "Linha 0 (o primeiro produto), coluna 1 (o preço)." },
+      { p: "Por que o menu compara opcao == \"1\" com aspas?", ops: ["Porque o input devolve texto", "Porque é mais rápido", "Por enfeite", "Porque 1 é negativo"], certa: 0, expl: "O valor digitado chega como texto, e texto se compara com texto." },
+    ],
+    pratica: [
+      passoAbrir(21),
+      {
+        titulo: "Conheça o Sistema",
+        html: `<p>O arquivo é novo. Ele tem: <code>mostrar_menu</code>, <code>ler_preco</code>, <code>cadastrar_produto</code>, <code>consultar_produto</code> e o <code>main</code>, que coordena tudo. São <b>5 lacunas</b>.</p>
+        ${vscode({ etapa: 21, aberto: true, linhas: [linhaDe(21, "def main"), linhaDe(21, "def main") + 14], realce: "lacunas" })}`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: o menu que repete",
+        html: `${py(`    while opcao ___ "0":
+        ...
+        if opcao == "1":
+            cadastrar_produto(produtos)
+        ___ opcao == "2":`)}
+        <ul><li><b>Lacuna 1:</b> o menu repete <b>enquanto</b> a opção for <b>diferente</b> de "0".</li><li><b>Lacuna 2:</b> a corrente de opções continua (senão, se...). Qual palavra do Python?</li></ul>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: validar o preço e cadastrar",
+        html: `${vscode({ etapa: 21, aberto: true, linhas: [linhaDe(21, "def ler_preco"), linhaDe(21, 'print("Produto cadastrado!")')], realce: "lacunas" })}
+        <ul><li><b>Lacuna 3:</b> o preço é inválido quando for menor <b>ou igual</b> a zero. Qual comparador?</li>
+        <li><b>Lacuna 4:</b> o produto entra no catálogo como <code>[nome, preço]</code>. Quais variáveis vão em cada lugar?</li></ul>`,
+      },
+      {
+        titulo: `Lacuna 5 (linha ${linhaDe(21, "produtos[i][0] ___ nome_busca")}): a comparação da consulta`,
+        html: `${py(`        if produtos[i][0] ___ nome_busca:`)}<p>O nome do produto da posição <code>i</code> é <b>igual</b> ao nome procurado? Qual operador compara igualdade?</p>`,
+      },
+      passoSalvar(),
+      passoRodar(21, caixa("pense", "Teste os erros", "<p>Rode de novo e tente: a opção <code>9</code>; o preço <code>0</code>; e consultar um produto que não existe. O sistema deve tratar cada caso sem quebrar.</p>")),
+      passoVerificar(21),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 22
+  E[22] = {
+    n: 22, semana: "Semana 22", tema: "Agenda e cadastros em memória",
+    titulo: "Cadastro em memória (validações e listagem)",
+    resumo: "O cadastro fica mais esperto: recusa nome vazio e repetido, ignora maiúsculas e lista os produtos.",
+    objetivos: ["Incluir, consultar e listar dados guardados numa lista em memória.", "Impedir nome vazio e duplicado.", "Comparar textos sem diferenciar maiúsculas com lower()."],
+    teoria: `
+<h2>1. Cadastro em memória</h2>
+<p>Os produtos ficam numa <b>lista</b>, na memória do computador. Isso é rápido, mas tem um limite importante: <b>quando o programa fecha, a lista some</b>. Na Etapa 25 o sistema vai aprender a guardar tudo em arquivo.</p>
+<table class="tab"><tr><th>Operação</th><th>Em Python</th></tr>
+<tr><td>Incluir</td><td><code>produtos.append([nome, preco])</code></td></tr>
+<tr><td>Consultar</td><td>percorrer a lista até achar o nome</td></tr>
+<tr><td>Listar</td><td>percorrer a lista inteira mostrando cada um</td></tr></table>
+
+<h2>2. Validações do cadastro</h2>
+<table class="tab"><tr><th>Situação</th><th>O sistema deve</th></tr>
+<tr><td>Nome vazio (só Enter)</td><td>Recusar: “O nome não pode ficar vazio.”</td></tr>
+<tr><td>Produto que já existe (mesmo com outras maiúsculas)</td><td>Recusar: “Produto já cadastrado.”</td></tr>
+<tr><td>Nome novo</td><td>Pedir o preço e cadastrar.</td></tr></table>
+${py(`if nome == "":
+    print("O nome não pode ficar vazio.")
+    return          # sai da função sem cadastrar`)}
+<p>O <code>return</code> sozinho, sem valor, encerra o procedimento na hora: o resto da função não roda.</p>
+
+<h2>3. Maiúsculas e minúsculas: lower()</h2>
+<p>Para o Python, <code>"Caneta"</code> e <code>"caneta"</code> são textos <b>diferentes</b>. Para comparar sem se importar com isso, transformamos os dois lados em minúsculas:</p>
+${py(`"CANETA".lower() == "Caneta".lower()   # "caneta" == "caneta" -> True`)}
+
+<h2>4. Listagem numerada e lista vazia</h2>
+${py(`if len(produtos) == 0:
+    print("Nenhum produto cadastrado.")
+    return
+for i in range(len(produtos)):
+    print(f"{i + 1}. {produtos[i][0]}: R$ {produtos[i][1]:.2f}")`)}
+<p>Sempre pense no caso da lista <b>vazia</b>: sem esse teste, a opção “listar” não mostraria nada, e o usuário ficaria sem saber se funcionou.</p>`,
+    quiz: [
+      { p: "O que acontece com os produtos cadastrados quando o programa fecha (nesta etapa)?", ops: ["Ficam salvos", "Somem", "Vão para o verificador", "Viram um CSV"], certa: 1, expl: "A lista existe só na memória enquanto o programa roda." },
+      { p: "\"PIX\".lower() == \"pix\" dá:", ops: ["True", "False", "Erro", "\"pix\""], certa: 0, expl: "lower() deixa \"PIX\" como \"pix\", igual ao outro lado." },
+      { p: "Para que serve o return sozinho no meio de cadastrar_produto?", ops: ["Para devolver o produto", "Para sair da função sem cadastrar", "Para repetir o menu", "Para fechar o programa"], certa: 1, expl: "return encerra a função na hora; as linhas seguintes (pedir preço, cadastrar) não rodam." },
+    ],
+    pratica: [
+      passoAbrir(22),
+      {
+        titulo: "Lacuna 1: recusar nome vazio",
+        html: `${vscode({ etapa: 22, aberto: true, linhas: [linhaDe(22, "def cadastrar_produto"), linhaDe(22, 'print("Produto cadastrado!")')], realce: "lacunas" })}
+        ${py(`    if nome == ___:`)}<p>Como se escreve um texto <b>vazio</b> em Python? (Duas aspas sem nada dentro.) Repare que a checagem de produto repetido, logo abaixo, já está pronta.</p>`,
+      },
+      {
+        titulo: `Lacuna 2 (linha ${linhaDe(22, "nome_busca.___()")}): consultar sem diferenciar maiúsculas`,
+        html: `${py(`        if produtos[i][0].lower() == nome_busca.___():`)}<p>O lado esquerdo já foi transformado em minúsculas. Faça o mesmo com o lado direito.</p>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: a listagem e a opção 3",
+        html: `${vscode({ etapa: 22, aberto: true, linhas: [linhaDe(22, "def listar_produtos"), linhaDe(22, "def listar_produtos") + 6], realce: "lacunas" })}
+        <ul><li><b>Lacuna 3:</b> a lista está vazia quando o tamanho dela é...?</li>
+        <li><b>Lacuna 4</b> (no <code>main</code>, linha ${linhaDe(22, "___(produtos)")}): a opção 3 chama qual função?</li></ul>`,
+      },
+      passoSalvar(),
+      passoRodar(22, caixa("pense", "Os 5 cenários da apostila", "<p>Teste: produto existente, inexistente, com maiúsculas diferentes, nome vazio e produto repetido. Liste <b>antes</b> de cadastrar qualquer coisa: deve aparecer “Nenhum produto cadastrado.”</p>")),
+      passoVerificar(22),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 23
+  E[23] = {
+    n: 23, semana: "Semana 23", tema: "Médias, faixas e classificação",
+    titulo: "Desempenho e ranking (médias e faixas)",
+    resumo: "O sistema já começa com o catálogo e as vendas da loja, classifica o giro de cada produto e monta o ranking.",
+    objetivos: ["Transformar critérios em regras de classificação por faixas.", "Calcular a média de vendas de cada produto e tratar o produto sem histórico.", "Ordenar resultados com sort(key=..., reverse=True) e gravar o ranking."],
+    teoria: `
+<h2>1. De critérios a regras</h2>
+<p>O dono quer saber quais produtos “giram” mais. Ele combinou estes <b>critérios</b>, que viram regras no código:</p>
+<table class="tab"><tr><th>Média de unidades por venda</th><th>Giro</th></tr>
+<tr><td>30 ou mais</td><td>Alto</td></tr><tr><td>10 ou mais (e menos de 30)</td><td>Médio</td></tr><tr><td>menos de 10</td><td>Baixo</td></tr><tr><td>nunca vendeu</td><td>Sem histórico</td></tr></table>
+${compara(`se media >= 30 entao
+   giro <- "Alto"
+senao se media >= 10 entao
+   giro <- "Médio"
+senao
+   giro <- "Baixo"
+fimse`, `if media >= 30:
+    return "Alto"
+elif media >= 10:
+    return "Médio"
+else:
+    return "Baixo"`)}
+${caixa("info", "Se as faixas mudarem...", "<p>...basta mudar <b>um</b> lugar: a função <code>classificar_desempenho</code>. É por isso que regras ficam em funções.</p>")}
+
+<h2>2. A média de um produto e o None</h2>
+<p>As vendas são uma lista de <code>[nome, quantidade]</code>. A média de um produto junta só as vendas <b>dele</b>. Se ele nunca foi vendido, não existe média: a função devolve <code>None</code> (“nada”), e o giro fica “Sem histórico”.</p>
+${py(`vendas = [["Caderno", 40], ["Caderno", 32], ["Caneta", 12]]
+calcular_media_vendas(vendas, "Caderno")   # (40 + 32) / 2 = 36.0
+calcular_media_vendas(vendas, "Régua")     # None`)}
+
+<h2>3. O ranking: ordenar com sort</h2>
+<p>Para cada produto montamos <code>[nome, média, giro]</code> e ordenamos pela média, da maior para a menor:</p>
+${py(`def pegar_media(resultado):
+    return resultado[1]          # a média está na posição 1
+
+resultados.sort(key=pegar_media, reverse=True)`)}
+<table class="tab"><tr><th>Parte</th><th>Quer dizer</th></tr>
+<tr><td><code>sort()</code></td><td>Ordena a própria lista.</td></tr>
+<tr><td><code>key=pegar_media</code></td><td>“Compare usando o que esta função devolve”: a média.</td></tr>
+<tr><td><code>reverse=True</code></td><td>Ordem <b>decrescente</b> (do maior para o menor).</td></tr></table>
+<p>No 2º bimestre você escreveu o Bubble Sort à mão para entender como ordenar. Agora usamos o <code>sort</code> pronto do Python.</p>
+
+<h2>4. O sistema já começa com dados</h2>
+<p>A partir desta etapa, o sistema começa com o catálogo e as vendas da loja (<code>produtos_iniciais()</code> e <code>vendas_iniciais()</code>), para o ranking ter o que mostrar. O ranking também é gravado em <code>ranking.txt</code>, com o modo <code>"w"</code> da Etapa 20.</p>`,
+    quiz: [
+      { p: "Média de 30 unidades por venda é qual giro?", ops: ["Alto", "Médio", "Baixo", "Sem histórico"], certa: 0, expl: "A regra é 30 OU MAIS: >= 30." },
+      { p: "O que reverse=True faz no sort?", ops: ["Inverte os nomes", "Ordena do maior para o menor", "Apaga a lista", "Ordena do menor para o maior"], certa: 1, expl: "Sem reverse a ordem é crescente; com reverse=True, decrescente." },
+      { p: "Por que a média de um produto sem vendas é None, e não 0?", ops: ["Porque 0 daria erro", "Para diferenciar \"nunca vendeu\" de \"vendeu pouco\"", "Porque o Python obriga", "Para o sort funcionar"], certa: 1, expl: "Média 0 poderia parecer \"vendeu muito pouco\". None deixa claro que não há histórico." },
+    ],
+    pratica: [
+      passoAbrir(23),
+      {
+        titulo: "O que há de novo",
+        html: `<p>O menu ganhou as opções <b>4 - Desempenho de um produto</b> e <b>5 - Ranking de vendas</b>. Veja as funções novas na parte <b>ETAPA 23</b>. São <b>4 lacunas</b>.</p>
+        ${vscode({ etapa: 23, aberto: true, linhas: [linhaDe(23, "def calcular_media_vendas"), linhaDe(23, 'return "Baixo"')], realce: "lacunas" })}`,
+      },
+      {
+        titulo: "Lacuna 1: a média",
+        html: `${py(`    return sum(quantidades) / ___`)}<p>Média = soma ÷ <b>quantidade de vendas</b> desse produto. Qual função diz quantos itens a lista <code>quantidades</code> tem?</p>`,
+      },
+      {
+        titulo: "Lacunas 2 e 3: as faixas",
+        html: `${py(`    if media >= ___:
+        return "Alto"
+    elif media >= ___:
+        return "Médio"`)}<p>Use a tabela de critérios da Teoria.</p>`,
+      },
+      {
+        titulo: `Lacuna 4 (linha ${linhaDe(23, "reverse=___")}): a ordem do ranking`,
+        html: `${py(`    resultados.sort(key=pegar_media, reverse=___)`)}<p>O ranking vai do produto que <b>mais</b> vende para o que menos vende. O <code>reverse</code> recebe <code>True</code> ou <code>False</code>?</p>`,
+      },
+      passoSalvar(),
+      passoRodar(23, caixa("pense", "Confira com a tabela", "<p>Caderno vendeu 40 e 32: média 36.0, giro Alto. Caneta: 12 e 15 = 13.5, Médio. Mochila: 3, Baixo. Borracha: nunca vendeu, Sem histórico. Depois da opção 5, abra o <code>ranking.txt</code> que apareceu na pasta etapa-23.</p>")),
+      passoVerificar(23),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 24
+  E[24] = {
+    n: 24, semana: "Semana 24", tema: "Quiz e desafios no terminal",
+    titulo: "Quiz de treinamento (tentativas e pontuação)",
+    resumo: "O sistema ganha um quiz para treinar funcionários novos, com até 3 tentativas por pergunta e pontuação.",
+    objetivos: ["Desenhar o fluxo de um programa interativo (pergunta, recebe, verifica, responde).", "Controlar tentativas e pontos com variáveis de estado e while.", "Percorrer perguntas e respostas paralelas com for."],
+    teoria: `
+<h2>1. O fluxo de uma pergunta</h2>
+<table class="tab"><tr><th>O programa...</th><th>No quiz</th></tr>
+<tr><td>pergunta</td><td>“A partir de quantos reais o frete é grátis?”</td></tr>
+<tr><td>recebe</td><td>a resposta digitada</td></tr>
+<tr><td>verifica</td><td>compara com a resposta certa</td></tr>
+<tr><td>responde</td><td>“Certo!” ou “Errado.”, e conta os pontos</td></tr></table>
+<p>As perguntas revisam as regras que você programou nos bimestres anteriores: o frete, o cupom e o menu.</p>
+
+<h2>2. Variáveis de estado</h2>
+<p>São variáveis que guardam “como as coisas estão” enquanto o programa roda: <code>pontos</code> (quantos acertos até agora), <code>tentativas</code> (quantas vezes já tentou esta pergunta) e <code>acertou</code> (já acertou?). Elas precisam ser criadas <b>antes</b> do laço que as usa.</p>
+
+<h2>3. Até 3 tentativas: while com duas condições</h2>
+${compara(`tentativas <- 0
+acertou <- falso
+enquanto (tentativas < 3) e (nao acertou) faca
+   leia(resposta)
+   tentativas <- tentativas + 1
+   se resposta = certa entao
+      acertou <- verdadeiro
+   fimse
+fimenquanto`, `tentativas = 0
+acertou = False
+while tentativas < 3 and not acertou:
+    resposta = input(pergunta)
+    tentativas = tentativas + 1
+    if resposta == certa:
+        acertou = True`)}
+<p>O laço para quando <b>acerta</b> ou quando <b>acabam as 3 tentativas</b>, o que vier primeiro.</p>
+
+<h2>4. Várias perguntas: for + listas paralelas</h2>
+${py(`perguntas = ["...frete grátis?", "...cupom?", "...sai do sistema?"]
+respostas = ["200", "ponto10", "0"]
+for i in range(len(perguntas)):
+    tentativas = 0         # cada pergunta começa com 0 tentativas!
+    ...`)}
+${caixa("atencao", "Zerar no lugar certo", "<p><code>tentativas = 0</code> fica <b>dentro</b> do <code>for</code>: cada pergunta tem as suas 3 chances. Já <code>pontos = 0</code> fica <b>antes</b> do <code>for</code>: os pontos se acumulam no quiz inteiro.</p>")}
+
+<h2>5. Resposta normalizada</h2>
+<p><code>.strip().lower()</code> tira espaços e deixa tudo minúsculo. Assim “ PONTO10 ” e “ponto10” contam como a mesma resposta.</p>`,
+    quiz: [
+      { p: "Quando o while das tentativas para?", ops: ["Só quando acerta", "Só depois de 3 tentativas", "Quando acerta OU depois de 3 tentativas", "Nunca"], certa: 2, expl: "A condição é tentativas < 3 and not acertou: basta uma parte ficar falsa." },
+      { p: "Onde deve ficar pontos = 0?", ops: ["Dentro do while", "Dentro do for", "Antes do for", "Depois do for"], certa: 2, expl: "Os pontos somam no quiz inteiro, então começam uma vez só, antes das perguntas." },
+      { p: "Por que usar .lower() na resposta?", ops: ["Para aceitar maiúsculas e minúsculas como iguais", "Para deixar o texto bonito", "Para contar letras", "Para apagar a resposta"], certa: 0, expl: "Quem digita PONTO10 ou ponto10 deu a mesma resposta." },
+    ],
+    pratica: [
+      passoAbrir(24),
+      {
+        titulo: "Encontre a parte ETAPA 24",
+        html: `${vscode({ etapa: 24, aberto: true, linhas: ["ETAPA 24:", linhaDe(24, "elif pontos >= ___") + 1], realce: "lacunas" })}
+        <p>O quiz é a opção <b>6</b> do menu. São <b>4 lacunas</b>.</p>`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: tentativas",
+        html: `${py(`        tentativas = ___
+        acertou = False
+        while tentativas < ___ and not acertou:`)}<p>Com quanto cada pergunta começa? E qual é o limite de tentativas?</p>`,
+      },
+      {
+        titulo: "Lacuna 3: comparar com a resposta da pergunta da vez",
+        html: `${py(`            if resposta == respostas[___]:`)}<p>A pergunta da vez é <code>perguntas[i]</code>. A resposta certa dela está na <b>mesma posição</b> da lista <code>respostas</code>.</p>`,
+      },
+      {
+        titulo: "Lacuna 4: a mensagem de desempenho",
+        html: `${py(`    elif pontos >= ___:
+        print("Bom! Revise o que errou.")`)}<p>Quem acertou tudo já recebeu “Excelente!”. A partir de quantos acertos é “Bom!”?</p>`,
+      },
+      passoSalvar(),
+      passoRodar(24, caixa("pense", "Teste os dois extremos", "<p>Faça o quiz acertando tudo de primeira. Depois, errando todas as tentativas: a resposta certa deve aparecer depois da 3ª tentativa errada de cada pergunta.</p>")),
+      passoVerificar(24),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 25
+  E[25] = {
+    n: 25, semana: "Semana 25", tema: "Do menu ao sistema completo",
+    titulo: "Sistema completo (vendas e arquivos)",
+    resumo: "O sistema ganha alterar preço e registrar venda e passa a guardar tudo em produtos.csv e vendas.csv.",
+    objetivos: ["Enxergar o sistema por partes: menu, funções e dados.", "Saber quais funções leem e quais alteram cada dado.", "Guardar os dados em arquivo ao sair e carregá-los ao abrir (persistência)."],
+    teoria: `
+<h2>1. O mapa do sistema</h2>
+<table class="tab"><tr><th>Parte</th><th>No sistema</th></tr>
+<tr><td><b>Menu</b> (coordenador)</td><td>o <code>main</code>: mostra opções e chama funções</td></tr>
+<tr><td><b>Dados</b></td><td><code>produtos</code> (lista de [nome, preço]) e <code>vendas</code> (lista de [nome, quantidade])</td></tr>
+<tr><td><b>Funções</b></td><td>cadastrar, consultar, listar, desempenho, ranking, quiz, alterar, vender</td></tr>
+<tr><td><b>Arquivos</b></td><td><code>produtos.csv</code> e <code>vendas.csv</code></td></tr></table>
+
+<h2>2. Quem lê e quem altera</h2>
+<table class="tab"><tr><th>Função</th><th>Lê</th><th>Altera</th></tr>
+<tr><td>consultar_produto, listar_produtos</td><td>produtos</td><td>-</td></tr>
+<tr><td>cadastrar_produto, alterar_produto</td><td>produtos</td><td>produtos</td></tr>
+<tr><td>registrar_venda</td><td>produtos</td><td>vendas</td></tr>
+<tr><td>consultar_desempenho, ranking</td><td>vendas (e produtos)</td><td>- (o ranking grava ranking.txt)</td></tr>
+<tr><td>salvar_produtos, salvar_vendas</td><td>produtos, vendas</td><td>os arquivos .csv</td></tr></table>
+<p><b>Percurso de uma venda:</b> menu (opção 8) → <code>registrar_venda</code> procura o produto em <code>produtos</code> → acrescenta <code>[nome, quantidade]</code> em <code>vendas</code> → a média e o giro do produto mudam na próxima consulta de desempenho.</p>
+
+<h2>3. Persistência: o sistema lembra</h2>
+<p>Até a Etapa 24, tudo sumia ao fechar o programa. Agora:</p>
+<ol><li><b>Ao abrir:</b> <code>carregar_produtos</code> lê o <code>produtos.csv</code>. Se o arquivo ainda não existe (primeira vez), começa com os produtos iniciais.</li>
+<li><b>Ao sair</b> (opção 0): <code>salvar_produtos</code> grava a lista inteira no arquivo, com o modo <code>"w"</code>.</li></ol>
+${py(`import csv
+with open(caminho, "w", encoding="utf-8", newline="") as arquivo:
+    escritor = csv.writer(arquivo)
+    escritor.writerow(["nome", "preco"])      # cabeçalho
+    for produto in produtos:
+        escritor.writerow(produto)            # ["Caneta", 4.5] -> Caneta,4.5`)}
+<p>O <code>csv.writer</code> é o par do <code>csv.reader</code> da Etapa 20: escreve cada lista como uma linha separada por vírgulas. Ao ler, o preço volta como texto e precisa de <code>float()</code>.</p>
+${caixa("atencao", "Por que \"w\" e não \"a\"?", "<p>Ao sair, a lista na memória tem <b>todos</b> os produtos, inclusive os antigos. Com <code>\"a\"</code>, eles seriam escritos de novo no fim do arquivo, e cada produto apareceria duplicado.</p>")}
+
+<h2>4. Alterar um produto</h2>
+<p>Na lista <code>[nome, preço]</code>, o preço fica na posição 1. Para mudar o preço do produto da posição <code>indice</code>: <code>produtos[indice][1] = novo_preco</code>.</p>`,
+    quiz: [
+      { p: "Qual função ALTERA a lista de vendas?", ops: ["consultar_produto", "registrar_venda", "listar_produtos", "mostrar_menu"], certa: 1, expl: "registrar_venda lê produtos (para achar o produto) e acrescenta em vendas." },
+      { p: "Na primeira vez que o sistema abre, o produtos.csv não existe. O que acontece?", ops: ["Dá erro", "Começa com os produtos iniciais", "Fecha o programa", "Cria um produto vazio"], certa: 1, expl: "carregar_produtos testa se o arquivo existe (os.path.exists) e, se não, usa produtos_iniciais()." },
+      { p: "Para mudar o preço do produto da posição 2, a linha certa é:", ops: ["produtos[2][0] = novo", "produtos[2][1] = novo", "produtos[1][2] = novo", "produtos[2] = novo"], certa: 1, expl: "Linha 2 (o produto), coluna 1 (o preço)." },
+    ],
+    pratica: [
+      passoAbrir(25),
+      {
+        titulo: "O que há de novo",
+        html: `<p>O menu ganhou <b>7 - Alterar preço</b> e <b>8 - Registrar venda</b>. A opção <b>0</b> agora salva os dados antes de sair, e o <code>main</code> carrega os arquivos ao abrir. São <b>4 lacunas</b>, na parte <b>ETAPA 25</b>.</p>
+        ${vscode({ etapa: 25, aberto: true, linhas: [linhaDe(25, "def main"), linhaDe(25, "def main") + 8] })}`,
+      },
+      {
+        titulo: "Lacunas 1 e 2: alterar e vender",
+        html: `${vscode({ etapa: 25, aberto: true, linhas: [linhaDe(25, "produtos[indice][___]") - 1, linhaDe(25, "produtos[indice][___]")], realce: "lacunas" })}
+        <ul><li><b>Lacuna 1:</b> em que posição de <code>[nome, preço]</code> fica o preço?</li>
+        <li><b>Lacuna 2</b> (linha ${linhaDe(25, "vendas.append([produtos[indice][0], ___])")}): a venda é <code>[nome, quantidade]</code>. Qual variável guarda a quantidade digitada?</li></ul>`,
+      },
+      {
+        titulo: "Lacunas 3 e 4: carregar e salvar",
+        html: `${vscode({ etapa: 25, aberto: true, linhas: [linhaDe(25, "def carregar_produtos"), linhaDe(25, "def salvar_produtos") + 5], realce: "lacunas" })}
+        <ul><li><b>Lacuna 3:</b> o preço sai do CSV como texto. Que função o transforma em número com casas decimais?</li>
+        <li><b>Lacuna 4:</b> ao salvar, o arquivo é recriado do zero com a lista atual. Qual modo de abertura? (Releia o quadro “Por que "w" e não "a"?”.)</li></ul>`,
+      },
+      passoSalvar(),
+      passoRodar(25, "", 1),
+      {
+        titulo: "Teste a persistência: feche e abra",
+        html: `<ol class="faca"><li>Rode o sistema, cadastre um produto (opção 1) e saia com <b>0</b>.</li>
+        <li>No EXPLORADOR, dentro de <b>etapa-25</b>, apareceram <b>produtos.csv</b> e <b>vendas.csv</b>. Abra o <code>produtos.csv</code>: o seu produto está lá.</li>
+        <li>Rode o sistema <b>de novo</b> e liste (opção 3): o produto continua!</li></ol>
+        ${caixa("info", "Quer recomeçar do zero?", "<p>Apague os arquivos <code>produtos.csv</code> e <code>vendas.csv</code> da pasta etapa-25 (botão direito › Excluir). Na próxima vez, o sistema começa com os dados iniciais. O verificador não depende desses arquivos: ele testa numa cópia separada.</p>")}`,
+      },
+      passoVerificar(25),
+    ],
+  };
+
+  // ---------------------------------------------------------------- ETAPA 26
+  E[26] = {
+    n: 26, semana: "Semana 26", tema: "Organizar e apresentar o projeto",
+    titulo: "Organizar e apresentar (refatoração)",
+    resumo: "O sistema fica pronto para a próxima manutenção: nomes honestos, campos com nome, busca e exibição centralizadas, com as mesmas saídas.",
+    objetivos: ["Reconhecer o que torna um código fácil de entender.", "Refatorar: renomear, dar nome aos campos, extrair funções e centralizar a busca.", "Provar com testes que o comportamento não mudou e apresentar o projeto."],
+    teoria: `
+<h2>1. O que torna um programa fácil de entender</h2>
+<p>Um programa é lido muito mais vezes do que é escrito, por você daqui a um mês ou por um colega. Na Etapa 25, o sistema funciona, mas tem pontos difíceis de manter:</p>
+<table class="tab"><tr><th>Problema</th><th>Exemplo</th><th>Melhoria</th></tr>
+<tr><td>Nome que não conta tudo</td><td><code>mostrar_ranking</code> também <b>salva</b> o arquivo</td><td>renomear para <code>mostrar_e_salvar_ranking</code></td></tr>
+<tr><td>Índices sem nome</td><td><code>produtos[i][0]</code>, <code>produtos[i][1]</code></td><td><code>nome = produtos[i][0]</code> e <code>preco = produtos[i][1]</code></td></tr>
+<tr><td>Busca repetida</td><td>o mesmo laço de busca em 4 funções</td><td>uma função <code>buscar_produto</code></td></tr>
+<tr><td>Exibição repetida</td><td><code>f"{...}: R$ {...:.2f}"</code> em vários lugares</td><td>uma função <code>formatar_produto</code></td></tr></table>
+
+<h2>2. Centralizar a busca (DRY)</h2>
+${py(`def buscar_produto(produtos, nome):
+    for i in range(len(produtos)):
+        if produtos[i][0].lower() == nome.lower():
+            return i            # achou: devolve a posição
+    return -1                   # não achou`)}
+<p>Agora cadastrar, consultar, alterar e vender usam a <b>mesma</b> busca. Se a regra mudar (por exemplo, ignorar acentos), muda-se um lugar só.</p>
+
+<h2>3. Refatorar com segurança</h2>
+<p>Refatorar é melhorar a <b>estrutura</b> sem mudar o <b>comportamento</b>. Como provar? Rodando os <b>mesmos testes</b> antes e depois: o verificador da Etapa 26 usa exatamente os testes da Etapa 25, mais testes das funções novas. Se as saídas forem iguais, a refatoração está correta.</p>
+${caixa("info", "Um passo de cada vez", "<p>Faça uma mudança, rode, confira. Mudar tudo de uma vez e só depois testar torna difícil descobrir qual mudança quebrou o programa.</p>")}
+
+<h2>4. Apresentar o projeto</h2>
+<p>Na apresentação, para cada mudança, explique: <b>o que</b> foi feito, <b>por que</b> melhora o código e <b>como</b> você confirmou que o programa continua funcionando. Essa é a prática das equipes profissionais na revisão de código.</p>`,
+    quiz: [
+      { p: "Refatorar é:", ops: ["Acrescentar opções ao menu", "Melhorar a estrutura sem mudar o comportamento", "Corrigir erros de digitação do usuário", "Apagar funções"], certa: 1, expl: "O programa faz a mesma coisa, mas fica mais fácil de entender e de mudar." },
+      { p: "buscar_produto([[\"Caneta\", 4.5]], \"régua\") devolve:", ops: ["0", "-1", "None", "\"Caneta\""], certa: 1, expl: "Não achou: a função devolve -1, uma posição que não existe." },
+      { p: "Como confirmar que uma refatoração não quebrou nada?", ops: ["Olhando o código", "Rodando os mesmos testes de antes e comparando as saídas", "Perguntando ao colega", "Não precisa"], certa: 1, expl: "As mesmas entradas devem produzir as mesmas saídas que antes da mudança." },
+    ],
+    pratica: [
+      passoAbrir(26),
+      {
+        titulo: "Lacunas 1, 2 e 3: as duas funções novas",
+        html: `${vscode({ etapa: 26, aberto: true, linhas: ["ETAPA 26:", linhaDe(26, 'return f"{nome}: R$ {___') + 1], realce: "lacunas" })}
+        <ul><li><b>Lacuna 1:</b> o nome do produto da posição <code>i</code> é comparado com qual parâmetro?</li>
+        <li><b>Lacuna 2:</b> o que devolver quando o produto não existe?</li>
+        <li><b>Lacuna 3:</b> depois de “R$” vem o preço, com 2 casas. Qual parâmetro?</li></ul>`,
+      },
+      {
+        titulo: `Lacuna 4 (linha ${linhaDe(26, "buscar_produto(___, nome_busca)")}): usar a busca na consulta`,
+        html: `${py(`    indice = buscar_produto(___, nome_busca)`)}<p>Em qual lista a função deve procurar? Repare em como a consulta ficou mais curta que na Etapa 25, e que <code>nome</code> e <code>preco</code> agora têm nome.</p>`,
+      },
+      {
+        titulo: `Lacuna 5 (linha ${linhaDe(26, "def ___(produtos, vendas)")}): um nome honesto`,
+        html: `${py(`def ___(produtos, vendas):`)}<p>A função mostra o ranking <b>e</b> salva o arquivo. Dê a ela o nome <b>mostrar_e_salvar_ranking</b>. A chamada no menu (opção 5) já usa esse nome.</p>`,
+      },
+      passoSalvar(),
+      passoRodar(26, caixa("ok", "Mesma tela da Etapa 25", "<p>Faça as mesmas operações que você fez na Etapa 25: as telas devem ser idênticas.</p>"), 1),
+      passoVerificar(26),
+      {
+        titulo: "Roteiro da apresentação",
+        html: `<p>Em grupo, preencham para <b>cada</b> mudança (renomear, campos com nome, buscar_produto, formatar_produto):</p>
+        <table class="tab"><tr><th>O que foi feito</th><th>Por que melhora</th><th>Como confirmamos que funciona</th></tr><tr><td><br><br></td><td></td><td></td></tr></table>
+        <p>Use esse roteiro na reflexão da entrega e na apresentação para a turma.</p>`,
+      },
+    ],
+    fim: caixa("ok", "🎉 Projeto completo: o Sistema da Papelaria Ponto Certo!", "<p>Do primeiro <code>print</code> da Etapa 0 até um sistema com menu, cadastro, ranking, quiz e dados salvos em arquivo: 27 etapas, quatro versões da papelaria e tudo o que a disciplina ensinou no ano. Parabéns!</p>"),
   };
 
   return E;

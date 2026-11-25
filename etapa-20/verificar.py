@@ -248,6 +248,33 @@ def executar(codigo_compilado, caminho, entradas, expressao=None):
     return res
 
 
+FECHOU_E_ABRIU = "--- (o programa foi fechado e aberto de novo) ---"
+
+
+def executar_em_copia(fontes, dados, alvo, execucoes):
+    """Roda o programa numa CÓPIA temporária da pasta (os arquivos do aluno nunca são
+    alterados). Cada item de execucoes é uma lista de valores digitados; entre uma
+    execução e outra o programa é fechado e aberto de novo, na mesma pasta temporária."""
+    pasta = _pasta_temporaria()
+    for nome, texto in list(fontes.items()) + list(dados.items()):
+        with open(os.path.join(pasta, nome), "w", encoding="utf-8", newline="") as f:
+            f.write(texto)
+    caminho = os.path.join(pasta, alvo)
+    compilado = compile(fontes[alvo], caminho, "exec")
+    saida, usadas, res = "", 0, None
+    for k, entradas in enumerate(execucoes):
+        if k > 0:
+            saida += FECHOU_E_ABRIU + "\n"
+        res = executar(compilado, caminho, entradas)
+        saida += res.saida
+        usadas += res.entradas_usadas
+        if res.erro or res.demorou:
+            break
+    res.saida = saida
+    res.entradas_usadas = usadas
+    return res
+
+
 def iguais(a, b):
     """Compara resultados aceitando diferenças minúsculas de arredondamento."""
     if isinstance(a, bool) or isinstance(b, bool):
@@ -352,6 +379,22 @@ def explicar_erro(tipo, mensagem, linha, fonte, arquivo=None):
         else:
             dica("int() só aceita número inteiro (ex.: 3). float() aceita número com ponto (ex.: 2.5).\n"
                  "Se o texto veio de um fatiamento [início:fim] ou de um split, confira os índices.")
+        return
+    if tipo == "UnboundLocalError":
+        nome = mensagem.split("'")[1] if "'" in mensagem else "?"
+        falhou("A variável '%s' foi usada antes de receber um valor." % nome)
+        if onde:
+            print(onde)
+        dica("Crie (ou zere) a variável ANTES de usá-la: por exemplo, o contador\n"
+             "recebe 0 antes do laço que soma nele.")
+        return
+    if tipo == "AttributeError":
+        falhou("O programa usou um comando que não existe para esse tipo de valor.")
+        if onde:
+            print(onde)
+        dica("Ex.: .lower() só existe para texto. Confira se a lista guarda os dados na\n"
+             "ordem certa ([nome, preço]) e se você não trocou um texto por um número.\n"
+             "(Mensagem do Python: %s)" % mensagem)
         return
     if tipo == "IndexError":
         falhou("O programa tentou usar uma posição que não existe na lista.")
@@ -600,8 +643,17 @@ def principal():
                 break
             ok(nome)
             continue
-        res = executar(compilados[alvo], os.path.join(pasta, alvo), caso["entradas"])
-        digitado = " / ".join(repr(x) if x == "" else x for x in caso["entradas"]) or "(nenhum)"
+        execucoes = caso.get("execucoes") or [caso["entradas"]]
+        if globals().get("EM_COPIA"):
+            dados = {}
+            for d in globals().get("DADOS_NOMES", []):
+                with open(os.path.join(pasta, d), "r", encoding="utf-8", newline="") as f:
+                    dados[d] = f.read()
+            res = executar_em_copia(fontes, dados, alvo, execucoes)
+        else:
+            res = executar(compilados[alvo], os.path.join(pasta, alvo), execucoes[0])
+        digitado = "  ||  (abriu de novo) ".join(
+            " / ".join(repr(x) if x == "" else x for x in ent) or "(nenhum)" for ent in execucoes)
         if res.demorou:
             falhou(nome)
             print("  O programa não terminou: parece uma repetição sem fim.")
