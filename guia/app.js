@@ -75,12 +75,51 @@
     return h;
   }
 
+  // ---------- dados do aluno e conferência com a lista de chamada ----------
+  function campoTurma(id, valor) {
+    const lista = window.Turmas ? window.Turmas.nomes() : [];
+    const outra = !!valor && !lista.includes(valor);
+    return `<select class="txt" id="${id}" data-turma>
+        <option value="">Escolha a sua turma</option>
+        ${lista.map((t) => `<option${t === valor ? " selected" : ""}>${esc(t)}</option>`).join("")}
+        <option value="__outra"${outra ? " selected" : ""}>Outra turma (não está na lista)</option>
+      </select>
+      <input class="txt" id="${id}Outra" data-turma-outra placeholder="Digite a sua turma" value="${outra ? esc(valor) : ""}" style="margin-top:8px;${outra ? "" : "display:none"}">`;
+  }
+  function lerTurma(id) {
+    const sel = document.getElementById(id);
+    if (!sel) return estado.aluno.turma || "";
+    return sel.value === "__outra" ? (document.getElementById(id + "Outra").value || "").trim() : sel.value;
+  }
+  function conferencia() {
+    const { nome, turma } = estado.aluno;
+    if (!turma || !nome || !nome.trim()) return { tipo: "vazio" };
+    const r = window.Turmas ? window.Turmas.conferir(nome, turma) : null;
+    return { tipo: r === true ? "ok" : r === false ? "nao" : "sem-lista", turma };
+  }
+  function statusNome() {
+    const c = conferencia();
+    if (c.tipo === "vazio") return `<p class="pequeno">Preencha o nome completo e escolha a turma.</p>`;
+    if (c.tipo === "ok") return T.caixa("ok", "✓ Nome conferido", `<p>Seu nome está na lista de chamada do <b>${esc(c.turma)}</b>.</p>`);
+    if (c.tipo === "sem-lista") return T.caixa("info", "Turma sem lista cadastrada", "<p>O professor ainda não cadastrou a lista desta turma: o nome vai no comprovante sem conferência.</p>");
+    return T.caixa("atencao", "Não encontramos este nome na lista", `<p>Confira se você digitou o nome <b>completo</b>, sem abreviar, como está na chamada do <b>${esc(c.turma)}</b> (acentos e maiúsculas não importam). Se você entrou agora na turma, pode entregar assim mesmo: o comprovante vai avisar o professor.</p>`);
+  }
+  function atualizarStatusNome() { document.querySelectorAll(".status-nome").forEach((el) => (el.innerHTML = statusNome())); }
+
   // ---------- página inicial ----------
   function paginaInicio() {
     const p = proxima();
     const t7 = window.KIT[7].saida.split(/^---- Teste \d+ - .*$/m)[2] || "";
     const tela = t7.replace(/^\n/, "").split("\n").slice(2).filter(Boolean);
     return `
+    <section class="cartao dados-aluno">
+      <h2 style="margin-top:0">Seus dados</h2>
+      <p class="pequeno" style="margin-top:0">Eles aparecem no comprovante de cada etapa e são conferidos com a lista de chamada da turma. Ficam guardados só neste navegador.</p>
+      <div class="duas-col"><div><label class="campo" for="nomeAluno">Nome completo (como está na chamada)</label><input class="txt" id="nomeAluno" value="${esc(estado.aluno.nome)}" autocomplete="name"></div>
+      <div><label class="campo" for="turmaAluno">Turma</label>${campoTurma("turmaAluno", estado.aluno.turma)}</div></div>
+      <div class="status-nome">${statusNome()}</div>
+    </section>
+
     <section class="capa">
       <div>
         <span class="etiqueta">Lógica de Programação · 1º ao 4º bimestre</span>
@@ -107,12 +146,7 @@
 
     <h2>As etapas</h2>
     ${BIMESTRES.map((x) => `<h3>${x.nome} <span class="pequeno">(${x.semanas})</span></h3><div class="mapa">${ETAPAS.filter((e) => bimDe(e.n) === x.b).map((e) => `<a class="etapa-card" href="#etapa-${e.n}">${statusDe(e.n)}<div class="num">Etapa ${e.n} · ${e.semana}</div><h3>${esc(e.titulo)}</h3><p>${e.resumo}</p></a>`).join("")}</div>`).join("")}
-
-    <h2>Seus dados</h2>
-    <div class="cartao"><p>Eles aparecem no comprovante de cada etapa. Ficam guardados só neste navegador.</p>
-      <div class="duas-col"><div><label class="campo" for="nomeAluno">Nome completo</label><input class="txt" id="nomeAluno" value="${esc(estado.aluno.nome)}" autocomplete="name"></div>
-      <div><label class="campo" for="turmaAluno">Turma</label><input class="txt" id="turmaAluno" value="${esc(estado.aluno.turma)}" placeholder="ex.: 1º C"></div></div>
-    </div>`;
+`;
   }
 
   // ---------- página da etapa ----------
@@ -172,8 +206,9 @@
       <h2>3. Entregue</h2>
       ${reg.codigo ? T.caixa("ok", `Etapa ${n} validada em ${esc(reg.data || "")}`, `<p>Código <b>${esc(reg.codigo)}</b>. Você pode gerar o comprovante de novo quando quiser, ou validar outra vez se mudar o programa.</p>`) : ""}
       <form class="cartao" id="formEntrega" autocomplete="off">
-        <div class="duas-col"><div><label class="campo" for="fNome">Nome completo</label><input class="txt" id="fNome" required value="${esc(estado.aluno.nome)}"></div>
-        <div><label class="campo" for="fTurma">Turma</label><input class="txt" id="fTurma" required value="${esc(estado.aluno.turma)}"></div></div>
+        <div class="duas-col"><div><label class="campo" for="fNome">Nome completo (como está na chamada)</label><input class="txt" id="fNome" required value="${esc(estado.aluno.nome)}"></div>
+        <div><label class="campo" for="fTurma">Turma</label>${campoTurma("fTurma", estado.aluno.turma)}</div></div>
+        <div class="status-nome">${statusNome()}</div>
         ${arquivosDe(n).map((a, i) => `<label class="campo" for="fPrograma${i}">Cole aqui o seu ${esc(a)} inteiro</label>
         <p class="pequeno" style="margin:0 0 6px">No VS Code, clique dentro do arquivo <b>${esc(a)}</b>, aperte <kbd>Ctrl</kbd>+<kbd>A</kbd> (seleciona tudo) e <kbd>Ctrl</kbd>+<kbd>C</kbd> (copia). Aqui, clique na caixa e aperte <kbd>Ctrl</kbd>+<kbd>V</kbd>.</p>
         <textarea class="txt mono" id="fPrograma${i}" data-programa="${i}" required spellcheck="false">${esc(programasDe(reg)[i] || "")}</textarea>`).join("")}
@@ -206,6 +241,7 @@
       <div class="linha-dados"><div><b>Aluno(a):</b> ${esc(reg.nome)}</div><div><b>Turma:</b> ${esc(reg.turma)}</div>
       <div><b>Validado em:</b> ${esc(reg.data)}</div><div><b>Código de conclusão:</b> ${esc(reg.codigo)}</div></div>
       <div class="selo">✓ Programa aprovado pelo verificador da Etapa ${n}</div>
+      <div class="bloco">${reg.conferido === "ok" ? "✓ Nome conferido com a lista de chamada da turma." : reg.conferido === "nao" ? "<b>⚠ Nome NÃO encontrado na lista de chamada da turma: confirmar com o professor.</b>" : "Turma sem lista cadastrada: nome não conferido."}</div>
       <div class="bloco"><h3>O que aprendi</h3><p>${esc(reg.reflexao).replace(/\n/g, "<br>")}</p></div>
       ${arquivosDe(n).map((a, i) => `<div class="bloco"><h3>Programa entregue (${esc(a)})</h3><pre>${esc(programasDe(reg)[i] || "")}</pre></div>`).join("")}`;
   }
@@ -251,6 +287,7 @@
     }
   });
   document.addEventListener("change", (ev) => {
+    if (ev.target.matches("[data-turma]")) ev.target.dispatchEvent(new Event("input", { bubbles: true }));
     const c = ev.target.closest("input[data-passo]");
     if (c) {
       estado.passos[c.dataset.passo] = c.checked; salvar();
@@ -259,20 +296,29 @@
   });
   document.addEventListener("input", (ev) => {
     if (ev.target.id === "nomeAluno" || ev.target.id === "fNome") { estado.aluno.nome = ev.target.value; salvar(); }
-    if (ev.target.id === "turmaAluno" || ev.target.id === "fTurma") { estado.aluno.turma = ev.target.value; salvar(); }
+    if (ev.target.matches("[data-turma], [data-turma-outra]")) {
+      const id = ev.target.id.replace(/Outra$/, "");
+      const outra = document.getElementById(id + "Outra");
+      if (outra) outra.style.display = document.getElementById(id).value === "__outra" ? "" : "none";
+      estado.aluno.turma = lerTurma(id); salvar();
+    }
+    if (ev.target.matches("#nomeAluno, #fNome, [data-turma], [data-turma-outra]")) atualizarStatusNome();
   });
   document.addEventListener("submit", (ev) => {
     if (ev.target.id !== "formEntrega") return;
     ev.preventDefault();
     const n = Number(location.hash.match(/etapa-(\d+)/)[1]);
-    const nome = $("#fNome").value.trim(), turma = $("#fTurma").value.trim();
+    const nome = $("#fNome").value.trim(), turma = lerTurma("fTurma");
     const programas = [...document.querySelectorAll("textarea[data-programa]")].map((t) => t.value);
     const programa = programas.join("\n"), reflexao = $("#fReflexao").value.trim();
     const digitado = $("#fCodigo").value.trim().toUpperCase().replace(/\s+/g, "");
     const res = $("#resultado");
     const erro = (t, h) => { res.innerHTML = T.caixa("erro", t, h); };
+    if (!turma) return erro("Escolha a sua turma.", "<p>Se ela não estiver na lista, escolha <b>Outra turma</b> e digite o nome dela.</p>");
     if (programas.some((p) => !p.trim())) return erro(programas.length > 1 ? "Falta colar um dos arquivos." : "Falta colar o programa.", "");
-    if (programa.includes("___")) return erro("O programa colado ainda tem lacuna ___.", "<p>Complete, salve, rode o verificador e copie de novo.</p>");
+    // Igual ao verificar.py: só conta lacuna fora de comentário (o cabeçalho da Etapa 0 cita "___").
+    const temLacuna = programas.some((p) => p.split("\n").some((l) => l.split("#")[0].includes("___")));
+    if (temLacuna) return erro("O programa colado ainda tem lacuna ___.", "<p>Complete, salve, rode o verificador e copie de novo.</p>");
     const m = digitado.match(/^E(\d+)-[0-9A-F]{4}-[0-9A-F]{4}$/);
     if (!m) return erro("O código de conclusão está incompleto.", `<p>Ele tem este formato: <b>E${n}-XXXX-XXXX</b> (letra E, número da etapa, e dois grupos de 4 letras ou números). Copie direto do terminal.</p>`);
     if (Number(m[1]) !== n) return erro(`Este código é da Etapa ${m[1]}, não da Etapa ${n}.`, `<p>Rode <code>python ${T.pastaDe(n)}/verificar.py</code> e use o código que ele mostrar.</p>`);
@@ -281,7 +327,8 @@
     }
     const agora = new Date();
     estado.aluno = { nome, turma };
-    estado.etapas[n] = { codigo: digitado, programa, programas, reflexao, nome, turma, data: agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) };
+    const conf = conferencia().tipo;
+    estado.etapas[n] = { codigo: digitado, programa, programas, reflexao, nome, turma, conferido: conf, data: agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) };
     salvar();
     rota();
     const r2 = $("#resultado");

@@ -174,11 +174,11 @@ details.problema summary { color: var(--erro); }
 
 /* ---------- formulário de entrega ---------- */
 label.campo { display: block; font-weight: 600; margin: 14px 0 4px; }
-input.txt, textarea.txt {
+input.txt, textarea.txt, select.txt {
   width: 100%; font: inherit; padding: 10px 12px; border: 1px solid #cfc8b9; border-radius: 9px; background: #fff;
 }
 textarea.txt.mono { font-family: var(--mono); font-size: 14px; min-height: 200px; }
-input.txt:focus, textarea.txt:focus { outline: 3px solid #99d5cd; border-color: var(--marca); }
+input.txt:focus, textarea.txt:focus, select.txt:focus { outline: 3px solid #99d5cd; border-color: var(--marca); }
 .botao {
   display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700; cursor: pointer;
   background: var(--marca); color: #fff; border: 0; border-radius: 10px; padding: 11px 20px; margin: 10px 8px 0 0; text-decoration: none;
